@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('education.index') }}">Education</a></li>
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('education.category_view', category=lesson.category.value) }}">
+          {{ lesson.category.value | replace('_',' ') | title }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active text-truncate" style="max-width: 300px;">{{ lesson.title }}</li>
+    </ol>
+  </nav>
+
+  <!-- Lesson Header Banner -->
+  <div class="lesson-header-card p-4 rounded-4 mb-4" style="background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%); color: white;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge" style="background: var(--accent); font-weight: 600;">{{ lesson.difficulty }}</span>
+        <span class="badge bg-light text-dark">{{ lesson.category.value | replace('_',' ') | title }}</span>
+        {% if lesson.subcategory %}
+        <span class="badge bg-secondary-subtle text-light border border-secondary">{{ lesson.subcategory }}</span>
+        {% endif %}
+      </div>
+      <button class="btn btn-sm btn-outline-light d-flex align-items-center gap-1" id="btn-save-lesson" onclick="toggleSaveLesson({{ lesson.id }})">
+        <i data-lucide="bookmark" id="bookmark-icon" style="width: 15px; height: 15px;"></i>
+        <span id="bookmark-text">Save Lesson</span>
+      </button>
+    </div>
+    <h1 class="h2 fw-bold text-white mb-2">{{ lesson.title }}</h1>
+    {% set content = lesson.content_json %}
+    {% if content.get('summary') %}
+    <p class="text-white-50 mb-0" style="font-size: 1.05rem;">{{ content['summary'] }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Lesson Navigation Tabs -->
+  <div class="lesson-nav-tabs d-flex gap-2 overflow-x-auto pb-2 mb-4 border-bottom">
+    <a href="#definition" class="btn btn-sm btn-outline-secondary rounded-pill active">1. Definition</a>
+    <a href="#explanation" class="btn btn-sm btn-outline-secondary rounded-pill">2. In Plain English</a>
+    <a href="#example" class="btn btn-sm btn-outline-secondary rounded-pill">3. Indian Example (₹)</a>
+    <a href="#how-it-works" class="btn btn-sm btn-outline-secondary rounded-pill">4. Step-by-Step</a>
+    <a href="#pros-cons" class="btn btn-sm btn-outline-secondary rounded-pill">5. Pros & Risks</a>
+    <a href="#mistakes" class="btn btn-sm btn-outline-secondary rounded-pill">6. Common Mistakes</a>
+    <a href="#faqs" class="btn btn-sm btn-outline-secondary rounded-pill">7. FAQs</a>
+    <a href="#quiz-section" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold">8. Knowledge Quiz</a>
+  </div>
+
+  <!-- 1. DEFINITION -->
+  <section id="definition" class="mb-5">
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+      <div class="card-body p-4" style="border-left: 5px solid var(--accent); background: white;">
+        <div class="d-flex align-items-center gap-2 mb-2 text-accent fw-bold text-uppercase small" style="letter-spacing: .05em;">
+          <i data-lucide="book-open" style="width:18px;height:18px;"></i> Formal Definition
+        </div>
+        <p class="fs-5 text-dark fw-medium mb-0" style="line-height: 1.6;">
+          {{ content.get('definition', content.get('summary', '')) }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. BEGINNER EXPLANATION -->
+  {% if content.get('beginner_explanation') %}
+  <section id="explanation" class="mb-5">
+    <h3 class="h5 fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+      <span class="badge rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="background: rgba(124,58,237,.15); color: var(--accent); width:28px;height:28px;">2</span>
+      Explained for Beginners (In Plain English)
+    </h3>
+    <div class="card border-0 shadow-sm rounded-3 p-4 bg-white">
+      <p class="text-secondary mb-0" style="font-size: 1.02rem; line-height: 1.7;">
+        {{ content['beginner_explanation'] }}
+      </p>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- 3. REAL-WORLD INDIAN EXAMPLE -->
+  {% if content.get('indian_example') %}
+  <section id="example" class="mb-5">
+    <h3 class="h5 fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+      <span class="badge rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="background: rgba(16,185,129,.15); color: #10b981; width:28px;height:28px;">3</span>
+      Real-World Indian Example (in ₹)
+    </h3>
+    <div class="card border-0 shadow-sm rounded-3 p-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border-left: 5px solid #10b981 !important;">
+      <div class="d-flex align-items-start gap-3">
+        <div class="p-2 rounded-3 bg-white shadow-sm text-success">
+          <i data-lucide="indian-rupee" style="width:24px;height:24px;"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-success-emphasis mb-2">Practical Scenario</h5>
+          <p class="text-dark mb-0" style="line-height: 1.65;">
+            {{ content['indian_example'] }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- 4. STEP-BY-STEP HOW IT WORKS -->
+  {% if content.get('how_it_works_steps') or content.get('sections') %}
+  <section id="how-it-works" class="mb-5">
+    <h3 class="h5 fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+      <span class="badge rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="background: rgba(59,130,246,.15); color: #3b82f6; width:28px;height:28px;">4</span>
+      How It Works: Step-by-Step
+    </h3>
+    <div class="card border-0 shadow-sm rounded-3 p-4 bg-white">
+      {% if content.get('how_it_works_steps') %}
+      <div class="timeline-steps">
+        {% for step in content['how_it_works_steps'] %}
+        <div class="d-flex gap-3 mb-3 pb-3 border-bottom border-light-subtle last-no-border">
+          <div class="step-badge rounded-circle bg-primary-soft text-primary fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.85rem;">
+            {{ loop.index }}
+          </div>
+          <div class="text-secondary pt-1" style="line-height: 1.6;">
+            {{ step }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% for section in content.get('sections', []) %}
+      <div class="mt-3">
+        <h5 class="fw-bold text-dark">{{ section.heading }}</h5>
+        <p class="text-secondary" style="white-space: pre-line; line-height: 1.65;">{{ section.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- 5. ADVANTAGES & RISKS -->
+  <section id="pros-cons" class="mb-5">
+    <h3 class="h5 fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+      <span class="badge rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="background: rgba(245,158,11,.15); color: #f59e0b; width:28px;height:28px;">5</span>
+      Key Advantages & Risks to Watch
+    </h3>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100 rounded-3 p-3 bg-white" style="border-top: 4px solid #10b981 !important;">
+          <h5 class="fw-bold text-success d-flex align-items-center gap-2 mb-3">
+            <i data-lucide="check-circle-2" style="width: 20px; height: 20px;"></i>
+            Advantages
+          </h5>
+          <ul class="list-unstyled mb-0">
+            {% for adv in content.get('advantages', content.get('key_points', [])) %}
+            <li class="d-flex align-items-start gap-2 mb-2 text-secondary small">
+              <i data-lucide="check" class="text-success flex-shrink-0 mt-1" style="width: 14px; height: 14px;"></i>
+              <span>{{ adv }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100 rounded-3 p-3 bg-white" style="border-top: 4px solid #ef4444 !important;">
+          <h5 class="fw-bold text-danger d-flex align-items-center gap-2 mb-3">
+            <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+            Disadvantages & Risks
+          </h5>
+          <ul class="list-unstyled mb-0">
+            {% for dis in content.get('disadvantages_and_risks', [
+              'Returns may lag behind inflation if not diversified.',
+              'Market volatility can lead to short-term paper losses.',
+              'Hidden charges or early exit penalties may apply.'
+            ]) %}
+            <li class="d-flex align-items-start gap-2 mb-2 text-secondary small">
+              <i data-lucide="x" class="text-danger flex-shrink-0 mt-1" style="width: 14px; height: 14px;"></i>
+              <span>{{ dis }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. COMMON MISTAKES -->
+  {% if content.get('common_mistakes') %}
+  <section id="mistakes" class="mb-5">
+    <div class="card border-0 shadow-sm rounded-3 p-4" style="background: #fff8f8; border-left: 5px solid #ef4444 !important;">
+      <h5 class="fw-bold text-danger d-flex align-items-center gap-2 mb-3">
+        <i data-lucide="shield-alert" style="width: 22px; height: 22px;"></i>
+        Common Beginner Mistakes in India
+      </h5>
+      <ul class="mb-0 text-dark ps-3">
+        {% for mistake in content['common_mistakes'] %}
+        <li class="mb-2" style="line-height: 1.6;">{{ mistake }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- 7. FREQUENTLY ASKED QUESTIONS -->
+  {% if content.get('faqs') %}
+  <section id="faqs" class="mb-5">
+    <h3 class="h5 fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+      <span class="badge rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="background: rgba(124,58,237,.15); color: var(--accent); width:28px;height:28px;">7</span>
+      Frequently Asked Questions (FAQs)
+    </h3>
+    <div class="accordion shadow-sm rounded-3" id="lessonFaqAccordion">
+      {% for faq in content['faqs'] %}
+      <div class="accordion-item border-light-subtle">
+        <h2 class="accordion-header" id="faqHeading{{ loop.index }}">
+          <button class="accordion-button collapsed fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="false">
+            {{ faq.q }}
+          </button>
+        </h2>
+        <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#lessonFaqAccordion">
+          <div class="accordion-body text-secondary" style="line-height: 1.65;">
+            {{ faq.a }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- 8. RELATED CALCULATOR CALLOUT -->
+  <div class="card border-0 shadow-sm rounded-3 p-4 mb-5 text-white" style="background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%);">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 rounded-3" style="background: rgba(124,58,237,.3);">
+          <i data-lucide="calculator" style="width:28px;height:28px;color:var(--accent-light);"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-white mb-1">Try the Interactive Financial Calculator</h5>
+          <p class="text-white-50 small mb-0">Model your own numbers with zero guesswork.</p>
+        </div>
+      </div>
+      <a href="{{ url_for('calculators.index') }}" class="btn btn-finbot-primary">
+        Open Calculators <i data-lucide="arrow-right" class="ms-1" style="width:16px;height:16px;"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- 9. KNOWLEDGE QUIZ SECTION -->
+  <section id="quiz-section" class="mb-5">
+    <div class="card border-0 shadow-md rounded-4 p-4 bg-white" style="border: 2px solid rgba(124,58,237,.2) !important;">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+          <div class="p-2 rounded-3 bg-purple-soft text-accent">
+            <i data-lucide="award" style="width:24px;height:24px;"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0 text-dark">Quick Knowledge Check</h4>
+            <p class="text-muted small mb-0">Test what you learned in this lesson (Instant feedback)</p>
+          </div>
+        </div>
+        <div class="badge bg-purple-soft text-accent px-3 py-2 rounded-pill fw-bold" id="quiz-badge">
+          {{ lesson.quiz_questions.count() }} Questions
+        </div>
+      </div>
+
+      {% if lesson.quiz_questions.count() > 0 %}
+      <form id="quiz-form">
+        {% for q in lesson.quiz_questions.all() %}
+        <div class="quiz-question-box mb-4 p-3 rounded-3 bg-light-finbot border border-light-subtle" data-qid="{{ q.id }}" data-correct="{{ q.correct_index }}">
+          <div class="fw-semibold text-dark mb-3 d-flex align-items-start gap-2">
+            <span class="badge bg-secondary-subtle text-dark border">{{ loop.index }}</span>
+            <span>{{ q.question }}</span>
+          </div>
+          <div class="quiz-options-group d-flex flex-column gap-2">
+            {% for opt in q.options_json %}
+            <label class="quiz-option-label p-2 px-3 rounded-2 border bg-white d-flex align-items-center gap-2 cursor-pointer transition">
+              <input type="radio" name="question_{{ q.id }}" value="{{ loop.index0 }}" class="form-check-input mt-0" required />
+              <span class="option-text small text-dark">{{ opt }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="quiz-feedback-box mt-3 d-none p-3 rounded-3 small"></div>
+        </div>
+        {% endfor %}
+
+        <div class="d-flex gap-3 align-items-center flex-wrap mt-3">
+          <button type="submit" class="btn btn-finbot-primary px-4 py-2" id="btn-submit-quiz">
+            <i data-lucide="send" class="me-1" style="width:16px;height:16px;"></i> Submit Quiz
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-3 py-2 d-none" id="btn-retake-quiz" onclick="resetQuiz()">
+            <i data-lucide="rotate-ccw" class="me-1" style="width:16px;height:16px;"></i> Retake Quiz
+          </button>
+          <div id="quiz-score-display" class="fw-bold fs-5 text-dark ms-auto"></div>
+        </div>
+      </form>
+      {% else %}
+      <div class="alert alert-info mb-0">
+        Quiz questions for this lesson are being updated. Complete the lesson below!
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- BOTTOM ACTION BAR -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 py-3 border-top">
+    <a href="{{ url_for('education.index') }}" class="btn btn-outline-secondary">
+      <i data-lucide="arrow-left" class="me-1" style="width:16px;height:16px;"></i> Back to Lessons
+    </a>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success px-4 py-2 d-flex align-items-center gap-2" id="btn-mark-complete" onclick="markComplete({{ lesson.id }})">
+        <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
+        <span id="complete-text">Mark Lesson as Complete</span>
+      </button>
+      <a href="{{ url_for('learning.index') }}" class="btn btn-finbot-primary">
+        Learning Path <i data-lucide="arrow-right" class="ms-1" style="width:16px;height:16px;"></i>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const LESSON_ID = {{ lesson.id }};
+
+// Mark Complete Handler
+function markComplete(lessonId) {
+  const btn = document.getElementById('btn-mark-complete');
+  const text = document.getElementById('complete-text');
+  
+  fetch('/learning/api/learning/progress', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({lesson_id: lessonId, time_spent: 60})
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      btn.className = 'btn btn-secondary px-4 py-2 disabled';
+      text.textContent = 'Lesson Completed! ✓';
+      lucide.createIcons();
+    }
+  });
+}
+
+// Check if already completed on load
+fetch('/learning/api/learning/progress')
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      const done = d.data.some(r => r.lesson_id === LESSON_ID && r.completed);
+      if (done) {
+        const btn = document.getElementById('btn-mark-complete');
+        if (btn) {
+          btn.className = 'btn btn-secondary px-4 py-2 disabled';
+          document.getElementById('complete-text').textContent = 'Lesson Completed! ✓';
+        }
+      }
+    }
+  }).catch(() => {});
+
+// Save / Bookmark Lesson
+function toggleSaveLesson(lessonId) {
+  const btn = document.getElementById('btn-save-lesson');
+  const text = document.getElementById('bookmark-text');
+  const isSaved = text.textContent.includes('Saved');
+  
+  if (isSaved) {
+    text.textContent = 'Save Lesson';
+    btn.classList.remove('btn-light');
+    btn.classList.add('btn-outline-light');
+  } else {
+    text.textContent = 'Saved ★';
+    btn.classList.remove('btn-outline-light');
+    btn.classList.add('btn-light');
+    btn.classList.add('text-dark');
+  }
+}
+
+// Interactive Quiz Submission
+const quizForm = document.getElementById('quiz-form');
+if (quizForm) {
+  quizForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const questionBoxes = document.querySelectorAll('.quiz-question-box');
+    const answers = [];
+    let allAnswered = true;
+    
+    questionBoxes.forEach(box => {
+      const qid = box.dataset.qid;
+      const selected = box.querySelector(`input[name="question_${qid}"]:checked`);
+      if (selected) {
+        answers.push(parseInt(selected.value));
+      } else {
+        allAnswered = false;
+      }
+    });
+    
+    if (!allAnswered) {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+    
+    fetch('/learning/api/learning/quiz', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lesson_id: LESSON_ID, answers: answers})
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        renderQuizResults(d.data);
+      } else {
+        alert(d.error || "Error grading quiz");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to submit quiz.");
+    });
+  });
+}
+
+function renderQuizResults(data) {
+  const scoreDisplay = document.getElementById('quiz-score-display');
+  scoreDisplay.innerHTML = `Score: <span class="${data.score === data.total ? 'text-success' : 'text-primary'}">${data.score} / ${data.total} (${data.percentage}%)</span>`;
+  
+  const questionBoxes = document.querySelectorAll('.quiz-question-box');
+  data.feedback.forEach((fb, idx) => {
+    const box = questionBoxes[idx];
+    const feedbackBox = box.querySelector('.quiz-feedback-box');
+    
+    if (fb.is_correct) {
+      feedbackBox.className = 'quiz-feedback-box mt-3 p-3 rounded-3 small bg-success-subtle text-success-emphasis border border-success';
+      feedbackBox.innerHTML = `<strong>✓ Correct!</strong> ${fb.explanation}`;
+    } else {
+      feedbackBox.className = 'quiz-feedback-box mt-3 p-3 rounded-3 small bg-danger-subtle text-danger-emphasis border border-danger';
+      feedbackBox.innerHTML = `<strong>✗ Incorrect.</strong> ${fb.explanation}`;
+    }
+    feedbackBox.classList.remove('d-none');
+    
+    // Highlight correct vs wrong labels
+    const labels = box.querySelectorAll('.quiz-option-label');
+    labels.forEach((lbl, optIdx) => {
+      if (optIdx === fb.correct) {
+        lbl.classList.add('border-success', 'bg-success-subtle', 'fw-semibold');
+      } else if (optIdx === fb.selected && !fb.is_correct) {
+        lbl.classList.add('border-danger', 'bg-danger-subtle');
+      }
+    });
+  });
+  
+  document.getElementById('btn-submit-quiz').classList.add('d-none');
+  document.getElementById('btn-retake-quiz').classList.remove('d-none');
+  
+  // Auto mark complete if passed (>= 50%)
+  if (data.percentage >= 50) {
+    markComplete(LESSON_ID);
+  }
+}
+
+function resetQuiz() {
+  const questionBoxes = document.querySelectorAll('.quiz-question-box');
+  questionBoxes.forEach(box => {
+    const feedbackBox = box.querySelector('.quiz-feedback-box');
+    feedbackBox.classList.add('d-none');
+    feedbackBox.innerHTML = '';
+    
+    const radios = box.querySelectorAll('input[type="radio"]');
+    radios.forEach(r => r.checked = false);
+    
+    const labels = box.querySelectorAll('.quiz-option-label');
+    labels.forEach(lbl => {
+      lbl.className = 'quiz-option-label p-2 px-3 rounded-2 border bg-white d-flex align-items-center gap-2 cursor-pointer transition';
+    });
+  });
+  
+  document.getElementById('quiz-score-display').innerHTML = '';
+  document.getElementById('btn-submit-quiz').classList.remove('d-none');
+  document.getElementById('btn-retake-quiz').classList.add('d-none');
+}
+</script>
+
+<style>
+.quiz-option-label:hover {
+  background-color: #f8fafc;
+  border-color: var(--accent);
+}
+.cursor-pointer { cursor: pointer; }
+.transition { transition: all 0.2s ease; }
+.step-badge {
+  background: rgba(124,58,237,.1);
+  color: var(--accent);
+}
+</style>
+{% endblock %}

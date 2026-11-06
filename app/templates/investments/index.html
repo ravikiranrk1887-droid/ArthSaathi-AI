@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}Investment Centre — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header Banner -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background: var(--accent);">Module 5</span>
+        <span class="badge bg-secondary-subtle text-dark border">Decision Support</span>
+      </div>
+      <h1 class="h2 fw-bold text-dark mb-1">Investment Centre</h1>
+      <p class="text-muted mb-0">Learn how 14 major asset classes work in India to build a balanced, resilient portfolio.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('calculators.index') }}" class="btn btn-finbot-outline text-dark border-secondary">
+        <i data-lucide="calculator" class="me-1" style="width:16px;height:16px;"></i> Calculators
+      </a>
+      <a href="{{ url_for('chatbot.index') }}" class="btn btn-finbot-primary">
+        <i data-lucide="bot" class="me-1" style="width:16px;height:16px;"></i> Ask AI about Investing
+      </a>
+    </div>
+  </div>
+
+  <!-- Mandatory SEBI Disclaimer Banner -->
+  <div class="alert alert-warning border-warning-subtle shadow-sm mb-4 p-3 rounded-3">
+    <div class="d-flex align-items-start gap-2">
+      <i data-lucide="shield-alert" class="text-warning flex-shrink-0 mt-1" style="width: 20px; height: 20px;"></i>
+      <div class="small">
+        <strong>Important Regulatory Notice:</strong> Investments in securities and market-linked instruments are subject to market risks.
+        ArthSaathi AI does not promise returns or recommend specific stocks, mutual funds, or schemes. Past performance is not indicative of future returns.
+        This module is strictly for educational financial literacy. Consult a SEBI-registered Investment Adviser before investing your hard-earned capital.
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk vs Reward Spectrum Overview -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+    <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+      <i data-lucide="bar-chart-2" class="text-accent" style="width:20px;height:20px;"></i>
+      Indian Investment Risk-Return Spectrum
+    </h5>
+    <div class="risk-spectrum-bar p-3 rounded-3" style="background: linear-gradient(90deg, #dcfce7 0%, #fef3c7 50%, #fee2e2 100%);">
+      <div class="d-flex justify-content-between text-dark fw-bold small mb-2">
+        <span class="text-success"><i data-lucide="shield-check" style="width:14px;height:14px;"></i> Low Risk / Fixed Income</span>
+        <span class="text-warning-emphasis"><i data-lucide="scale" style="width:14px;height:14px;"></i> Moderate Risk / Hybrid</span>
+        <span class="text-danger"><i data-lucide="trending-up" style="width:14px;height:14px;"></i> High Risk / Equity Growth</span>
+      </div>
+      <div class="progress" style="height: 10px;">
+        <div class="progress-bar bg-success" style="width: 33%"></div>
+        <div class="progress-bar bg-warning" style="width: 34%"></div>
+        <div class="progress-bar bg-danger" style="width: 33%"></div>
+      </div>
+      <div class="d-flex justify-content-between text-muted small mt-2 flex-wrap gap-1" style="font-size: 0.8rem;">
+        <span>Savings • FDs • T-Bills • PPF</span>
+        <span>Corporate Bonds • Gold • Hybrid Funds</span>
+        <span>Index Funds • Mutual Funds • Direct Stocks</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Category Filter Pills -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+    <div class="btn-group shadow-sm" role="group" id="filter-btn-group">
+      <button type="button" class="btn btn-sm btn-primary active" onclick="filterCategory('all', this)">All (14)</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterCategory('Equity', this)">Equity & Stocks</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterCategory('Debt', this)">Debt & Fixed Income</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterCategory('Government', this)">Sovereign & PPF</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterCategory('Gold', this)">Gold / Commodity</button>
+    </div>
+    <div class="text-muted small">
+      Showing <strong id="visible-count">14</strong> instruments
+    </div>
+  </div>
+
+  <!-- Instrument Cards Grid -->
+  <div class="row g-4 mb-5" id="instruments-grid">
+    {% for item in instruments %}
+    <div class="col-md-6 col-lg-4 instrument-card-item" data-category="{{ item.category }}">
+      <div class="card h-100 border-0 shadow-sm rounded-4 transition hover-lift overflow-hidden bg-white">
+        <!-- Top accent color bar -->
+        <div style="height: 5px; background: {% if item.risk_badge == 'danger' %}#ef4444{% elif item.risk_badge == 'warning' %}#f59e0b{% elif item.risk_badge == 'primary' %}#3b82f6{% else %}#10b981{% endif %};"></div>
+        <div class="card-body p-4 d-flex flex-column">
+          <!-- Badges -->
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-secondary-subtle text-dark small border">{{ item.category }}</span>
+            <span class="badge bg-{{ item.risk_badge }}-subtle text-{{ item.risk_badge }} border border-{{ item.risk_badge }}-subtle">
+              {{ item.risk_level }}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h5 class="fw-bold text-dark mb-2">{{ item.name }}</h5>
+          <p class="text-muted small mb-3 flex-grow-1" style="line-height: 1.5;">
+            {{ item.definition }}
+          </p>
+
+          <!-- Key Metrics Pills -->
+          <div class="bg-light-finbot p-2 rounded-3 mb-3 small">
+            <div class="d-flex justify-content-between py-1 border-bottom border-light-subtle">
+              <span class="text-muted">Min Investment:</span>
+              <strong class="text-dark">{{ item.min_investment }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom border-light-subtle">
+              <span class="text-muted">Ideal Horizon:</span>
+              <strong class="text-dark">{{ item.horizon }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-muted">Liquidity:</span>
+              <strong class="text-dark">{{ item.liquidity }}</strong>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2 mt-auto">
+            <button class="btn btn-sm btn-outline-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-{{ item.id }}">
+              View Details & Tax
+            </button>
+            {% if item.calculator %}
+            <a href="{{ url_for('calculators.index') }}" class="btn btn-sm btn-light border" title="Calculate">
+              <i data-lucide="calculator" style="width:15px;height:15px;"></i>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL FOR DETAILED BREAKDOWN -->
+    <div class="modal fade" id="modal-{{ item.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="modal-header text-white" style="background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);">
+            <div>
+              <div class="badge bg-white text-dark small mb-1">{{ item.category }}</div>
+              <h5 class="modal-title fw-bold text-white mb-0">{{ item.name }}</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4 bg-white">
+            <!-- How It Works -->
+            <div class="mb-4">
+              <h6 class="fw-bold text-accent text-uppercase small" style="letter-spacing: .05em;">How It Works</h6>
+              <p class="text-secondary" style="line-height: 1.6;">{{ item.how_it_works }}</p>
+            </div>
+
+            <!-- Tax Considerations -->
+            <div class="mb-4 p-3 rounded-3" style="background: #f8fafc; border-left: 4px solid var(--accent);">
+              <h6 class="fw-bold text-dark d-flex align-items-center gap-1 mb-2">
+                <i data-lucide="receipt" style="width:16px;height:16px;color:var(--accent);"></i>
+                Tax Considerations in India
+              </h6>
+              <p class="small text-secondary mb-0" style="line-height: 1.6;">{{ item.tax_considerations }}</p>
+            </div>
+
+            <!-- Advantages & Disadvantages -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-success-subtle h-100">
+                  <h6 class="fw-bold text-success mb-2">Advantages</h6>
+                  <ul class="list-unstyled small mb-0">
+                    {% for adv in item.advantages %}
+                    <li class="d-flex align-items-start gap-1 mb-1">
+                      <i data-lucide="check" class="text-success flex-shrink-0 mt-1" style="width:14px;height:14px;"></i>
+                      <span>{{ adv }}</span>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-danger-subtle h-100">
+                  <h6 class="fw-bold text-danger mb-2">Disadvantages</h6>
+                  <ul class="list-unstyled small mb-0">
+                    {% for dis in item.disadvantages %}
+                    <li class="d-flex align-items-start gap-1 mb-1">
+                      <i data-lucide="x" class="text-danger flex-shrink-0 mt-1" style="width:14px;height:14px;"></i>
+                      <span>{{ dis }}</span>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Important Risks -->
+            <div class="p-3 rounded-3 bg-warning-subtle text-warning-emphasis small">
+              <strong class="d-flex align-items-center gap-1 mb-1">
+                <i data-lucide="alert-triangle" style="width:15px;height:15px;"></i> Important Risks to Remember:
+              </strong>
+              {{ item.important_risks }}
+            </div>
+          </div>
+          <div class="modal-footer bg-light-finbot border-top-0 py-2">
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            <a href="{{ url_for('chatbot.index') }}" class="btn btn-sm btn-finbot-primary">
+              Ask ArthSaathi about {{ item.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- COMPREHENSIVE COMPARISON TABLE -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="fw-bold text-dark mb-0">Investment Comparison Matrix</h4>
+        <p class="text-muted small mb-0">Side-by-side comparison of risk, returns potential, liquidity, and taxation.</p>
+      </div>
+      <input type="text" id="table-search" class="form-control form-control-sm" style="max-width: 250px;" placeholder="Search instrument..." onkeyup="searchTable()" />
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="comparison-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Asset Class</th>
+            <th scope="col">Category</th>
+            <th scope="col">Risk Level</th>
+            <th scope="col">Min Investment</th>
+            <th scope="col">Liquidity</th>
+            <th scope="col">Horizon</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in instruments %}
+          <tr data-cat="{{ item.category }}">
+            <td class="fw-semibold text-dark">{{ item.name }}</td>
+            <td><span class="badge bg-light text-dark border">{{ item.category }}</span></td>
+            <td>
+              <span class="badge bg-{{ item.risk_badge }}-subtle text-{{ item.risk_badge }}">
+                {{ item.risk_level }}
+              </span>
+            </td>
+            <td class="small">{{ item.min_investment }}</td>
+            <td class="small">{{ item.liquidity }}</td>
+            <td class="small">{{ item.horizon }}</td>
+            <td>
+              <button class="btn btn-xs btn-outline-primary py-1 px-2 small" data-bs-toggle="modal" data-bs-target="#modal-{{ item.id }}">
+                Details
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterCategory(cat, btn) {
+  const buttons = document.querySelectorAll('#filter-btn-group button');
+  buttons.forEach(b => b.classList.remove('btn-primary', 'active'));
+  buttons.forEach(b => b.classList.add('btn-outline-secondary'));
+  
+  btn.classList.add('btn-primary', 'active');
+  btn.classList.remove('btn-outline-secondary');
+  
+  const cards = document.querySelectorAll('.instrument-card-item');
+  let count = 0;
+  
+  cards.forEach(card => {
+    const itemCat = card.dataset.category || '';
+    if (cat === 'all') {
+      card.style.display = '';
+      count++;
+    } else if (cat === 'Government') {
+      if (itemCat.includes('Government') || itemCat.includes('Sovereign') || itemCat.includes('Pension') || itemCat.includes('Money Market')) {
+        card.style.display = '';
+        count++;
+      } else {
+        card.style.display = 'none';
+      }
+    } else if (itemCat.toLowerCase().includes(cat.toLowerCase())) {
+      card.style.display = '';
+      count++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  
+  document.getElementById('visible-count').textContent = count;
+}
+
+function searchTable() {
+  const query = document.getElementById('table-search').value.toLowerCase();
+  const rows = document.querySelectorAll('#comparison-table tbody tr');
+  
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+</script>
+
+<style>
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+</style>
+{% endblock %}

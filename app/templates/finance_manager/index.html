@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+{% block title %}Personal Finance Manager — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background: var(--accent);">Module 7</span>
+        <span class="badge bg-secondary-subtle text-dark border">Money Tracking</span>
+      </div>
+      <h1 class="h2 fw-bold text-dark mb-1">Personal Finance Manager</h1>
+      <p class="text-muted mb-0">Track your cash inflows, manage expense categories, and build healthy Indian budgeting habits.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#incomeModal">
+        <i data-lucide="plus-circle" style="width:15px;height:15px;"></i> Add Income
+      </button>
+      <button class="btn btn-finbot-primary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#expenseModal">
+        <i data-lucide="minus-circle" style="width:15px;height:15px;"></i> Add Expense
+      </button>
+      <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#budgetModal">
+        <i data-lucide="target" style="width:15px;height:15px;"></i> Set Budget
+      </button>
+    </div>
+  </div>
+
+  <!-- Key Metrics 4-Card Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">Monthly Income</span>
+          <div class="p-2 rounded-3 bg-success-subtle text-success">
+            <i data-lucide="arrow-down-left" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <div class="h3 fw-bold text-success mb-1" id="dash-total-income">₹ 0</div>
+        <div class="text-muted small" id="income-count-label">0 income credits</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">Total Expenses</span>
+          <div class="p-2 rounded-3 bg-danger-subtle text-danger">
+            <i data-lucide="arrow-up-right" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <div class="h3 fw-bold text-danger mb-1" id="dash-total-expense">₹ 0</div>
+        <div class="text-muted small" id="expense-count-label">0 transactions</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">Net Savings</span>
+          <div class="p-2 rounded-3 bg-primary-soft text-primary">
+            <i data-lucide="wallet" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="dash-net-savings">₹ 0</div>
+        <div class="text-muted small">Savings Rate: <strong id="dash-savings-pct" class="text-success">0%</strong></div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted small fw-semibold">Budget Utilization</span>
+          <div class="p-2 rounded-3 bg-purple-soft text-accent">
+            <i data-lucide="pie-chart" style="width:18px;height:18px;"></i>
+          </div>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="dash-budget-util">0%</div>
+        <div class="progress mt-2" style="height: 6px;">
+          <div id="dash-budget-bar" class="progress-bar bg-success" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts & Smart Suggestions Row -->
+  <div class="row g-4 mb-4">
+    <!-- Category Breakdown Chart -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+            <i data-lucide="donut" class="text-accent" style="width:20px;height:20px;"></i>
+            Category-Wise Spending
+          </h5>
+          <span class="badge bg-light text-dark small border">9 Categories</span>
+        </div>
+
+        <div class="row align-items-center my-auto">
+          <div class="col-sm-6 text-center">
+            <div style="max-width: 210px; margin: 0 auto; position: relative;">
+              <canvas id="expense-pie-chart" width="210" height="210"></canvas>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div id="expense-legend-list" class="d-flex flex-column gap-1 small mt-3 mt-sm-0">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Smart AI Savings Suggestions -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <i data-lucide="sparkles" class="text-accent" style="width:20px;height:20px;"></i>
+          Automated Smart Savings Insights
+        </h5>
+        <div id="smart-suggestions-list" class="d-flex flex-column gap-3">
+          <!-- Dynamic suggestion cards populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Transactions Table Card -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-5">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="fw-bold text-dark mb-0">Financial Records & Transactions</h4>
+        <p class="text-muted small mb-0">Edit or delete any past entry with zero permanent locks.</p>
+      </div>
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-outline-secondary active" onclick="filterTransactions('ALL', this)">All</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="filterTransactions('EXPENSE', this)">Expenses</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="filterTransactions('INCOME', this)">Income</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="transactions-table">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category / Source</th>
+            <th>Description</th>
+            <th class="text-end">Amount (₹)</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody id="transactions-tbody">
+          <!-- Populated via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: ADD INCOME
+     ========================================================================= -->
+<div class="modal fade" id="incomeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold">Add Income Record</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 bg-white">
+        <form id="income-form" onsubmit="submitIncome(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Amount (₹)</label>
+            <input type="number" id="inc-amount" class="form-control" placeholder="50000" min="1" step="1" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Income Source</label>
+            <select id="inc-source" class="form-select" required>
+              <option value="Salary" selected>Monthly Salary</option>
+              <option value="Freelance">Freelance / Consulting</option>
+              <option value="Business">Business Profits</option>
+              <option value="Rental">Rental Income</option>
+              <option value="Investment">Dividends / Interest</option>
+              <option value="Other">Other Income</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Date</label>
+            <input type="date" id="inc-date" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Description (Optional)</label>
+            <input type="text" id="inc-desc" class="form-control" placeholder="e.g. November Paycheck" />
+          </div>
+          <button type="submit" class="btn btn-success w-100 py-2">Save Income</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: ADD EXPENSE
+     ========================================================================= -->
+<div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-finbot text-white">
+        <h5 class="modal-title fw-bold">Add Expense Record</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 bg-white">
+        <form id="expense-form" onsubmit="submitExpense(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Amount (₹)</label>
+            <input type="number" id="exp-amount" class="form-control" placeholder="1500" min="1" step="1" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Expense Category</label>
+            <select id="exp-category" class="form-select" required>
+              <option value="FOOD" selected>🍔 Food & Groceries</option>
+              <option value="RENT">🏠 Rent & Housing</option>
+              <option value="BILLS">💡 Utilities & Bills</option>
+              <option value="TRANSPORT">🚗 Transportation & Fuel</option>
+              <option value="EDUCATION">📚 Education & Books</option>
+              <option value="SHOPPING">🛍️ Shopping & Clothing</option>
+              <option value="HEALTHCARE">💊 Healthcare & Medicines</option>
+              <option value="ENTERTAINMENT">🎬 Entertainment & Leisure</option>
+              <option value="OTHER">📦 Other Expenses</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Date</label>
+            <input type="date" id="exp-date" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Description (Optional)</label>
+            <input type="text" id="exp-desc" class="form-control" placeholder="e.g. Supermarket grocery shopping" />
+          </div>
+          <button type="submit" class="btn btn-finbot-primary w-100 py-2">Record Expense</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: SET BUDGET
+     ========================================================================= -->
+<div class="modal fade" id="budgetModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">Set Monthly Budget</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 bg-white">
+        <form id="budget-form" onsubmit="submitBudget(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Expected Monthly Income (₹)</label>
+            <input type="number" id="b-income" class="form-control" placeholder="60000" min="0" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Total Target Expense Limit (₹)</label>
+            <input type="number" id="b-total-expense" class="form-control" placeholder="40000" min="0" required />
+          </div>
+          <div class="alert alert-info small py-2 mb-3">
+            ArthSaathi will track your live spending against this limit and warn you when you cross 80%.
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2">Save Budget</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let incomeList = [];
+let expenseList = [];
+let monthlyBudgetLimit = 40000;
+let pieChart = null;
+
+const CATEGORY_COLORS = {
+  FOOD: '#f59e0b',
+  RENT: '#0d2137',
+  BILLS: '#3b82f6',
+  TRANSPORT: '#10b981',
+  EDUCATION: '#7c3aed',
+  SHOPPING: '#ec4899',
+  HEALTHCARE: '#ef4444',
+  ENTERTAINMENT: '#8b5cf6',
+  OTHER: '#6b7280'
+};
+
+function fmtINR(val) {
+  return '₹ ' + Math.round(val).toLocaleString('en-IN');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default dates to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('inc-date').value = today;
+  document.getElementById('exp-date').value = today;
+
+  loadFinanceData();
+});
+
+async function loadFinanceData() {
+  try {
+    const [incRes, expRes, bRes] = await Promise.all([
+      fetch('/finance/api/finance/income').then(r => r.json()),
+      fetch('/finance/api/finance/expense').then(r => r.json()),
+      fetch('/finance/api/finance/budget').then(r => r.json())
+    ]);
+
+    incomeList = incRes.data || [];
+    expenseList = expRes.data || [];
+
+    if (bRes.data && bRes.data.expense_budget && bRes.data.expense_budget.TOTAL) {
+      monthlyBudgetLimit = bRes.data.expense_budget.TOTAL;
+    }
+
+    // If completely empty, pre-fill sample demo data so user immediately sees rich charts
+    if (incomeList.length === 0 && expenseList.length === 0) {
+      await seedSampleFinance();
+      return;
+    }
+
+    updateDashboard();
+  } catch (err) {
+    console.error("Finance data fetch error:", err);
+  }
+}
+
+async function seedSampleFinance() {
+  const today = new Date().toISOString().split('T')[0];
+  // Seed sample income
+  await fetch('/finance/api/finance/income', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ amount: 65000, source: 'Salary', date: today, description: 'November Salary' })
+  });
+
+  // Seed 4 sample expenses
+  const samples = [
+    { amount: 16000, category: 'RENT', date: today, description: 'House Rent' },
+    { amount: 7500, category: 'FOOD', date: today, description: 'Monthly Groceries & Milk' },
+    { amount: 3200, category: 'BILLS', date: today, description: 'Electricity & WiFi' },
+    { amount: 2500, category: 'TRANSPORT', date: today, description: 'Metro & Fuel' },
+    { amount: 1800, category: 'ENTERTAINMENT', date: today, description: 'Movies & Dining' }
+  ];
+
+  for (const s of samples) {
+    await fetch('/finance/api/finance/expense', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(s)
+    });
+  }
+
+  loadFinanceData();
+}
+
+function updateDashboard() {
+  const totalIncome = incomeList.reduce((sum, item) => sum + item.amount, 0);
+  const totalExpense = expenseList.reduce((sum, item) => sum + item.amount, 0);
+  const netSavings = totalIncome - totalExpense;
+  const savingsPct = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
+  const budgetUtil = monthlyBudgetLimit > 0 ? Math.round((totalExpense / monthlyBudgetLimit) * 100) : 0;
+
+  document.getElementById('dash-total-income').textContent = fmtINR(totalIncome);
+  document.getElementById('income-count-label').textContent = `${incomeList.length} credit entries`;
+
+  document.getElementById('dash-total-expense').textContent = fmtINR(totalExpense);
+  document.getElementById('expense-count-label').textContent = `${expenseList.length} transactions`;
+
+  const savingsEl = document.getElementById('dash-net-savings');
+  savingsEl.textContent = fmtINR(netSavings);
+  savingsEl.className = 'h3 fw-bold mb-1 ' + (netSavings >= 0 ? 'text-dark' : 'text-danger');
+
+  const pctEl = document.getElementById('dash-savings-pct');
+  pctEl.textContent = `${savingsPct}%`;
+  pctEl.className = savingsPct >= 20 ? 'text-success' : (savingsPct > 0 ? 'text-warning' : 'text-danger');
+
+  document.getElementById('dash-budget-util').textContent = `${budgetUtil}%`;
+  const bar = document.getElementById('dash-budget-bar');
+  bar.style.width = `${Math.min(budgetUtil, 100)}%`;
+  bar.className = 'progress-bar ' + (budgetUtil > 90 ? 'bg-danger' : (budgetUtil > 70 ? 'bg-warning' : 'bg-success'));
+
+  renderExpenseChart();
+  renderSuggestions(totalIncome, totalExpense, savingsPct);
+  renderTransactionsTable('ALL');
+}
+
+function renderExpenseChart() {
+  const categoryTotals = {};
+  expenseList.forEach(e => {
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+  });
+
+  const categories = Object.keys(categoryTotals);
+  const amounts = categories.map(c => categoryTotals[c]);
+  const colors = categories.map(c => CATEGORY_COLORS[c] || '#6b7280');
+
+  const ctx = document.getElementById('expense-pie-chart').getContext('2d');
+  if (pieChart) {
+    pieChart.data.labels = categories;
+    pieChart.data.datasets[0].data = amounts;
+    pieChart.data.datasets[0].backgroundColor = colors;
+    pieChart.update();
+  } else {
+    pieChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: categories,
+        datasets: [{
+          data: amounts,
+          backgroundColor: colors,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        cutout: '68%'
+      }
+    });
+  }
+
+  // Build legend list
+  const legend = document.getElementById('expense-legend-list');
+  legend.innerHTML = '';
+  const total = amounts.reduce((a, b) => a + b, 0);
+
+  categories.forEach(c => {
+    const val = categoryTotals[c];
+    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+    const item = document.createElement('div');
+    item.className = 'd-flex justify-content-between align-items-center py-1 border-bottom border-light-subtle';
+    item.innerHTML = `
+      <span class="d-flex align-items-center gap-2">
+        <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: ${CATEGORY_COLORS[c] || '#6b7280'};"></span>
+        <span class="text-dark">${c}</span>
+      </span>
+      <strong class="text-secondary">${fmtINR(val)} (${pct}%)</strong>
+    `;
+    legend.appendChild(item);
+  });
+}
+
+function renderSuggestions(totalIncome, totalExpense, savingsPct) {
+  const container = document.getElementById('smart-suggestions-list');
+  container.innerHTML = '';
+
+  const suggestions = [];
+
+  // 1. 50/30/20 Rule check
+  if (savingsPct >= 20) {
+    suggestions.push({
+      type: 'success',
+      icon: 'check-circle-2',
+      title: 'Strong 50/30/20 Discipline',
+      text: `Great job! You are saving <strong>${savingsPct}%</strong> of your monthly income (above the recommended 20% threshold). Consider channeling surplus savings into diversified index funds.`
+    });
+  } else {
+    suggestions.push({
+      type: 'warning',
+      icon: 'alert-triangle',
+      title: 'Savings Below 20% Target',
+      text: `Your current savings rate is <strong>${savingsPct}%</strong>. Under the 50/30/20 rule, aim to save at least 20% (₹ ${Math.round(totalIncome * 0.2).toLocaleString('en-IN')}) by auditing discretionary shopping or dining expenses.`
+    });
+  }
+
+  // 2. Emergency fund target
+  const targetEmergency = totalExpense * 6;
+  suggestions.push({
+    type: 'info',
+    icon: 'shield',
+    title: 'Recommended Emergency Fund',
+    text: `Based on your monthly expense run rate of ${fmtINR(totalExpense)}, your 6-month safety net target is <strong>${fmtINR(targetEmergency)}</strong> kept in liquid sweep-in FDs.`
+  });
+
+  // 3. Category concentration check
+  let foodSpend = 0;
+  expenseList.filter(e => e.category === 'FOOD').forEach(e => foodSpend += e.amount);
+  if (totalExpense > 0 && (foodSpend / totalExpense) > 0.35) {
+    suggestions.push({
+      type: 'primary',
+      icon: 'coffee',
+      title: 'Food & Dining Alert',
+      text: `Food accounts for <strong>${Math.round((foodSpend/totalExpense)*100)}%</strong> of your expenses. Cooking meals at home and moderating food delivery can unlock significant monthly savings.`
+    });
+  }
+
+  suggestions.forEach(s => {
+    const card = document.createElement('div');
+    card.className = `p-3 rounded-3 bg-${s.type}-subtle border border-${s.type}-subtle text-${s.type}-emphasis small`;
+    card.innerHTML = `
+      <div class="fw-bold d-flex align-items-center gap-2 mb-1">
+        <i data-lucide="${s.icon}" style="width: 16px; height: 16px;"></i> ${s.title}
+      </div>
+      <div style="line-height: 1.5;">${s.text}</div>
+    `;
+    container.appendChild(card);
+  });
+
+  lucide.createIcons();
+}
+
+function renderTransactionsTable(filter) {
+  const tbody = document.getElementById('transactions-tbody');
+  tbody.innerHTML = '';
+
+  let list = [];
+  if (filter === 'ALL' || filter === 'INCOME') {
+    incomeList.forEach(inc => list.push({ ...inc, itemType: 'INCOME' }));
+  }
+  if (filter === 'ALL' || filter === 'EXPENSE') {
+    expenseList.forEach(exp => list.push({ ...exp, itemType: 'EXPENSE' }));
+  }
+
+  // Sort by date descending
+  list.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No records found. Click 'Add Income' or 'Add Expense' above!</td></tr>`;
+    return;
+  }
+
+  list.forEach(item => {
+    const isInc = item.itemType === 'INCOME';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="small text-muted">${item.date}</td>
+      <td>
+        <span class="badge ${isInc ? 'bg-success' : 'bg-danger'} small">
+          ${isInc ? 'INCOME' : 'EXPENSE'}
+        </span>
+      </td>
+      <td><strong>${isInc ? item.source : item.category}</strong></td>
+      <td class="small text-secondary">${item.description || '—'}</td>
+      <td class="text-end fw-bold ${isInc ? 'text-success' : 'text-danger'}">
+        ${isInc ? '+' : '-'} ${fmtINR(item.amount)}
+      </td>
+      <td class="text-center">
+        <button class="btn btn-xs btn-outline-danger py-0 px-2 small" onclick="deleteRecord('${item.itemType}', ${item.id})" title="Delete">
+          <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  lucide.createIcons();
+}
+
+function filterTransactions(type, btn) {
+  const buttons = btn.parentElement.querySelectorAll('button');
+  buttons.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTransactionsTable(type);
+}
+
+// Form Submissions
+async function submitIncome(e) {
+  e.preventDefault();
+  const payload = {
+    amount: parseFloat(document.getElementById('inc-amount').value),
+    source: document.getElementById('inc-source').value,
+    date: document.getElementById('inc-date').value,
+    description: document.getElementById('inc-desc').value
+  };
+
+  const res = await fetch('/finance/api/finance/income', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (data.success) {
+    bootstrap.Modal.getInstance(document.getElementById('incomeModal')).hide();
+    document.getElementById('income-form').reset();
+    loadFinanceData();
+  } else {
+    alert(data.error || "Failed to add income");
+  }
+}
+
+async function submitExpense(e) {
+  e.preventDefault();
+  const payload = {
+    amount: parseFloat(document.getElementById('exp-amount').value),
+    category: document.getElementById('exp-category').value,
+    date: document.getElementById('exp-date').value,
+    description: document.getElementById('exp-desc').value
+  };
+
+  const res = await fetch('/finance/api/finance/expense', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (data.success) {
+    bootstrap.Modal.getInstance(document.getElementById('expenseModal')).hide();
+    document.getElementById('expense-form').reset();
+    loadFinanceData();
+  } else {
+    alert(data.error || "Failed to add expense");
+  }
+}
+
+async function submitBudget(e) {
+  e.preventDefault();
+  const total = parseFloat(document.getElementById('b-total-expense').value);
+  monthlyBudgetLimit = total;
+
+  await fetch('/finance/api/finance/budget', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      income_budget: parseFloat(document.getElementById('b-income').value),
+      expense_budget: { TOTAL: total }
+    })
+  });
+
+  bootstrap.Modal.getInstance(document.getElementById('budgetModal')).hide();
+  updateDashboard();
+}
+
+async function deleteRecord(type, id) {
+  if (!confirm(`Are you sure you want to delete this ${type.toLowerCase()} record?`)) return;
+
+  const endpoint = type === 'INCOME' ? `/finance/api/finance/income/${id}` : `/finance/api/finance/expense/${id}`;
+  const res = await fetch(endpoint, { method: 'DELETE' });
+  const data = await res.json();
+  if (data.success) {
+    loadFinanceData();
+  } else {
+    alert(data.error || "Delete failed");
+  }
+}
+</script>
+{% endblock %}

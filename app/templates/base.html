@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ArthSaathi AI — Learn Finance. Compare Banks. Make Smarter Decisions.{% endblock %}</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- ArthSaathi main CSS -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="finbot-app">
+
+<!-- =====================================================================
+     APP WRAPPER (SIDEBAR + MAIN CONTENT)
+====================================================================== -->
+<div class="d-flex" id="app-wrapper">
+
+  <!-- ===================================================================
+       DESKTOP & OFF-CANVAS SIDEBAR NAVIGATION
+       =================================================================== -->
+  <aside class="finbot-sidebar" id="sidebar">
+    <div class="sidebar-header d-flex align-items-center justify-content-between p-3 border-bottom border-navy-subtle">
+      <a href="{{ url_for('main.landing') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+        <div class="brand-icon">
+          <i data-lucide="bot" class="brand-icon-svg"></i>
+        </div>
+        <div class="brand-text">ArthSaathi <span class="brand-accent">AI</span></div>
+      </a>
+      <button class="btn btn-sm btn-link text-white-50 d-lg-none" onclick="toggleSidebar()">
+        <i data-lucide="x" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="sidebar-nav p-3 d-flex flex-column gap-1">
+      <div class="sidebar-heading text-uppercase small text-white-50 mb-1" style="font-size: 0.7rem; letter-spacing: .08em;">
+        Core Platform
+      </div>
+
+      <a href="{{ url_for('main.dashboard') }}" class="sidebar-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+        <i data-lucide="layout-dashboard" class="sidebar-icon"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="{{ url_for('education.index') }}" class="sidebar-link {% if 'education' in request.endpoint %}active{% endif %}">
+        <i data-lucide="graduation-cap" class="sidebar-icon"></i>
+        <span>Education Centre</span>
+      </a>
+
+      <a href="{{ url_for('investments.index') }}" class="sidebar-link {% if 'investments' in request.endpoint %}active{% endif %}">
+        <i data-lucide="trending-up" class="sidebar-icon"></i>
+        <span>Investment Centre</span>
+      </a>
+
+      <a href="{{ url_for('calculators.index') }}" class="sidebar-link {% if 'calculators' in request.endpoint %}active{% endif %}">
+        <i data-lucide="calculator" class="sidebar-icon"></i>
+        <span>Calculators (7)</span>
+      </a>
+
+      <a href="{{ url_for('banks.compare') }}" class="sidebar-link {% if 'banks' in request.endpoint %}active{% endif %}">
+        <i data-lucide="landmark" class="sidebar-icon"></i>
+        <span>Compare 10 Banks</span>
+      </a>
+
+      <div class="sidebar-heading text-uppercase small text-white-50 mt-3 mb-1" style="font-size: 0.7rem; letter-spacing: .08em;">
+        Tools & Progress
+      </div>
+
+      <a href="{{ url_for('chatbot.index') }}" class="sidebar-link {% if 'chatbot' in request.endpoint %}active{% endif %}">
+        <i data-lucide="bot" class="sidebar-icon text-accent"></i>
+        <span>ArthSaathi Assistant</span>
+        <span class="badge bg-purple-soft text-accent ms-auto small" style="font-size: 0.65rem;">AI</span>
+      </a>
+
+      <a href="{{ url_for('finance_manager.index') }}" class="sidebar-link {% if 'finance_manager' in request.endpoint %}active{% endif %}">
+        <i data-lucide="wallet" class="sidebar-icon"></i>
+        <span>Finance Manager</span>
+      </a>
+
+      <a href="{{ url_for('learning.index') }}" class="sidebar-link {% if 'learning' in request.endpoint %}active{% endif %}">
+        <i data-lucide="award" class="sidebar-icon"></i>
+        <span>Learning Progress</span>
+      </a>
+    </div>
+
+    <!-- Sidebar Bottom Badge -->
+    <div class="mt-auto p-3 border-top border-navy-subtle">
+      <div class="p-3 rounded-3 bg-white bg-opacity-10 text-white-50 small">
+        <div class="d-flex align-items-center gap-1 text-white fw-bold mb-1">
+          <i data-lucide="shield-check" style="width:14px;height:14px;color:#10b981;"></i> RBI & DICGC Aligned
+        </div>
+        Deposits insured up to ₹5 Lakh per bank in India.
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================================================================
+       MAIN VIEW WRAPPER
+       =================================================================== -->
+  <div class="main-wrapper flex-grow-1 d-flex flex-column min-vh-100">
+    <!-- Top Bar -->
+    <header class="topbar sticky-top d-flex align-items-center justify-content-between px-3 px-lg-4 py-2 bg-white border-bottom shadow-xs">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-light border d-lg-none" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+          <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+        </button>
+        <span class="d-none d-md-inline-block text-muted small fw-medium">
+          🇮🇳 India's Financial Literacy & Decision Support Platform
+        </span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="{{ url_for('calculators.index') }}" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1">
+          <i data-lucide="calculator" style="width: 14px; height: 14px;"></i> Calculators
+        </a>
+        <a href="{{ url_for('banks.compare') }}" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1">
+          <i data-lucide="landmark" style="width: 14px; height: 14px;"></i> Compare Banks
+        </a>
+        <a href="{{ url_for('chatbot.index') }}" class="btn btn-sm btn-finbot-primary d-inline-flex align-items-center gap-1">
+          <i data-lucide="bot" style="width: 15px; height: 15px;"></i> Ask ArthSaathi
+        </a>
+      </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Main Content Block -->
+    <main class="flex-grow-1">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-finbot text-white py-4 mt-auto">
+      <div class="container-fluid px-4">
+        <div class="row gy-3">
+          <div class="col-md-5">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="brand-icon" style="width:28px;height:28px;">
+                <i data-lucide="bot" style="width:16px;height:16px;color:white;"></i>
+              </div>
+              <strong class="text-white fs-6">ArthSaathi AI</strong>
+            </div>
+            <p class="text-white-50 small mb-2" style="max-width: 450px;">
+              Learn Finance. Compare Banks. Make Smarter Decisions. Empowering everyday citizens across India with transparent financial literacy and decision support.
+            </p>
+            <div class="text-white-50 small" style="font-size: 0.75rem;">
+              © {{ 2024 }} ArthSaathi AI. Built for financial empowerment in India 🇮🇳
+            </div>
+          </div>
+          <div class="col-md-3">
+            <h6 class="text-white small fw-bold text-uppercase" style="letter-spacing: .05em;">Key Modules</h6>
+            <ul class="list-unstyled small text-white-50 mb-0">
+              <li><a href="{{ url_for('education.index') }}" class="text-white-50 text-decoration-none">Financial Education</a></li>
+              <li><a href="{{ url_for('investments.index') }}" class="text-white-50 text-decoration-none">Investment Centre</a></li>
+              <li><a href="{{ url_for('calculators.index') }}" class="text-white-50 text-decoration-none">Loan & SIP Calculators</a></li>
+              <li><a href="{{ url_for('banks.compare') }}" class="text-white-50 text-decoration-none">Indian Bank Comparison</a></li>
+              <li><a href="{{ url_for('finance_manager.index') }}" class="text-white-50 text-decoration-none">Personal Finance Manager</a></li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h6 class="text-white small fw-bold text-uppercase" style="letter-spacing: .05em;">Responsible Finance Notice</h6>
+            <p class="text-white-50 small mb-0" style="font-size: 0.75rem; line-height: 1.5;">
+              ArthSaathi AI is an educational platform. Bank interest rates shown are indicative demo records for comparison. Always verify on official bank websites before applying. Calculations are estimates. ArthSaathi does not offer contractual financial, tax, or legal advice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Main App JS -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+// Initialize Lucide icons
+lucide.createIcons();
+
+// Sidebar toggle for mobile
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('show');
+}
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

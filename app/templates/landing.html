@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+{% block title %}ArthSaathi AI — Learn Finance. Compare Banks. Make Smarter Decisions.{% endblock %}
+
+{% block content %}
+<!-- =========================================================================
+     1. HERO SECTION
+     ========================================================================= -->
+<section class="hero-section py-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d2137 0%, #112a45 50%, #1a3a5c 100%);">
+  <div class="container py-lg-4 text-center position-relative" style="z-index: 2;">
+    <!-- Pill badge -->
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background: rgba(124,58,237,.25); border: 1px solid rgba(167,139,250,.4); color: #c4b5fd; font-size: 0.85rem; font-weight: 600;">
+      <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+      Empowering Financial Literacy for Everyone in India 🇮🇳
+    </div>
+
+    <!-- Main Title -->
+    <h1 class="display-4 fw-bold text-white mb-3" style="letter-spacing: -0.03em; line-height: 1.15;">
+      Learn Finance. Compare Banks.<br/>
+      <span style="background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Make Smarter Decisions.
+      </span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="lead text-white-50 mx-auto mb-4" style="max-width: 680px; font-size: 1.15rem; line-height: 1.6;">
+      Even if you have zero prior financial knowledge. ArthSaathi AI demystifies loans, compounding, mutual fund SIPs, and bank interest rates across 10 top Indian banks.
+    </p>
+
+    <!-- CTAs -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-5">
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-finbot-primary btn-lg px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow">
+        <i data-lucide="rocket" style="width: 18px; height: 18px;"></i>
+        Open Dashboard
+      </a>
+      <a href="{{ url_for('calculators.index') }}" class="btn btn-light btn-lg px-4 py-2 fw-semibold text-dark d-inline-flex align-items-center gap-2 shadow">
+        <i data-lucide="calculator" style="width: 18px; height: 18px;"></i>
+        Try Calculators
+      </a>
+      <a href="{{ url_for('chatbot.index') }}" class="btn btn-outline-light btn-lg px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+        <i data-lucide="bot" style="width: 18px; height: 18px;"></i>
+        Ask ArthSaathi AI
+      </a>
+    </div>
+
+    <!-- Live Platform Stat Counters -->
+    <div class="row g-3 justify-content-center" style="max-width: 850px; margin: 0 auto;">
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 text-center border border-white border-opacity-10">
+          <div class="h3 fw-bold text-white mb-0">15+</div>
+          <div class="text-white-50 small">Structured Lessons</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 text-center border border-white border-opacity-10">
+          <div class="h3 fw-bold text-white mb-0">10</div>
+          <div class="text-white-50 small">Top Indian Banks</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 text-center border border-white border-opacity-10">
+          <div class="h3 fw-bold text-white mb-0">7</div>
+          <div class="text-white-50 small">Financial Calculators</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 text-center border border-white border-opacity-10">
+          <div class="h3 fw-bold text-white mb-0">₹0</div>
+          <div class="text-white-50 small">100% Free Forever</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     2. INTRODUCTION TO ARTHSAATHI AI
+     ========================================================================= -->
+<section class="py-5 bg-white">
+  <div class="container py-lg-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="badge bg-purple-soft text-accent px-3 py-1 rounded-pill fw-bold mb-2">Our Mission</div>
+        <h2 class="h1 fw-bold text-dark mb-3">Finance Designed for Every Indian Citizen</h2>
+        <p class="text-secondary mb-3" style="font-size: 1.05rem; line-height: 1.7;">
+          In India, schools and colleges teach algebra and calculus, but rarely how a home loan EMI is calculated, how credit card compounding ruins credit scores, or why keeping ₹5 lakh idle in a 2.7% savings account loses money to inflation every single year.
+        </p>
+        <p class="text-secondary mb-4" style="line-height: 1.7;">
+          <strong>ArthSaathi AI changes that.</strong> We are not just another generic chatbot. We are a complete, interactive financial education and banking decision-support platform designed specifically for students, young professionals, and families across India.
+        </p>
+        <div class="d-flex gap-4">
+          <div class="d-flex align-items-center gap-2">
+            <i data-lucide="check-circle" class="text-success" style="width:20px;height:20px;"></i>
+            <span class="fw-semibold text-dark">Zero Jargon</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i data-lucide="check-circle" class="text-success" style="width:20px;height:20px;"></i>
+            <span class="fw-semibold text-dark">Indian Rupee (₹) Examples</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i data-lucide="check-circle" class="text-success" style="width:20px;height:20px;"></i>
+            <span class="fw-semibold text-dark">SEBI & RBI Aligned</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4 text-white" style="background: linear-gradient(135deg, #1e3a5f 0%, #0d2137 100%);">
+          <h4 class="fw-bold text-white mb-3">Who is ArthSaathi AI For?</h4>
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex gap-3 align-items-start">
+              <div class="p-2 rounded-3 bg-white bg-opacity-10 text-white flex-shrink-0">
+                <i data-lucide="graduation-cap" style="width: 20px; height: 20px;"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold text-white mb-1">College Students & Beginners</h6>
+                <p class="text-white-50 small mb-0">Learn what a bank is, how UPI & credit cards work, and how to avoid early debt traps.</p>
+              </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start">
+              <div class="p-2 rounded-3 bg-white bg-opacity-10 text-white flex-shrink-0">
+                <i data-lucide="briefcase" style="width: 20px; height: 20px;"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold text-white mb-1">Salaried Working Professionals</h6>
+                <p class="text-white-50 small mb-0">Master 50/30/20 monthly budgeting, start your first mutual fund SIP, and protect your 750+ CIBIL score.</p>
+              </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start">
+              <div class="p-2 rounded-3 bg-white bg-opacity-10 text-white flex-shrink-0">
+                <i data-lucide="home" style="width: 20px; height: 20px;"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold text-white mb-1">Home Buyers & Families</h6>
+                <p class="text-white-50 small mb-0">Compare home loan rates across 10 Indian banks, calculate prepayments, and save lakhs in interest.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     3. MAIN PLATFORM FEATURES
+     ========================================================================= -->
+<section class="py-5 bg-light-finbot">
+  <div class="container py-lg-4">
+    <div class="text-center mb-5" style="max-width: 650px; margin: 0 auto;">
+      <div class="badge bg-purple-soft text-accent px-3 py-1 rounded-pill fw-bold mb-2">Platform Modules</div>
+      <h2 class="h1 fw-bold text-dark">Six Pillars of Smarter Decisions</h2>
+      <p class="text-muted">Everything you need to master your personal finances without expensive advisory fees.</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- 1. Education -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="graduation-cap" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Financial Education Centre</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            15+ comprehensive structured lessons with real-world Indian examples, step-by-step mechanisms, advantages, risks, and interactive quizzes.
+          </p>
+          <a href="{{ url_for('education.index') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            Explore Lessons →
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Calculators -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="calculator" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Financial Calculators (7)</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            EMI, Fixed Deposit, SIP, Recurring Deposit, Compound Interest, Inflation, and Prepayment calculators with interactive Chart.js visualizations.
+          </p>
+          <a href="{{ url_for('calculators.index') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            Try Calculators →
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. Bank Comparison -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="landmark" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">10 Bank Comparison Engine</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            Compare Home, Education, Personal, Vehicle, and Business loans plus FDs across SBI, HDFC, ICICI, Axis, Kotak, BOB, Canara, PNB, Union, and Indian Bank.
+          </p>
+          <a href="{{ url_for('banks.compare') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            Compare Banks →
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. Investment Centre -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="trending-up" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Investment Centre</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            Detailed breakdown of 14 asset classes in India: Stocks, Mutual Funds, SIP, Index Funds, Bonds, G-Secs, T-Bills, PPF, NPS, FDs, and Sovereign Gold.
+          </p>
+          <a href="{{ url_for('investments.index') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            View Assets Guide →
+          </a>
+        </div>
+      </div>
+
+      <!-- 5. AI Assistant -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="bot" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">ArthSaathi AI Assistant</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            Ask any question in plain English. Powered by Google Gemini and backed by an offline intelligent financial knowledge engine with zero downtime.
+          </p>
+          <a href="{{ url_for('chatbot.index') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            Chat with ArthSaathi →
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. Finance Manager -->
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white transition hover-lift">
+          <div class="feature-icon-wrap">
+            <i data-lucide="wallet" class="feature-icon"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Personal Finance Manager</h5>
+          <p class="text-muted small mb-3 flex-grow-1">
+            Track income and expenses across 9 Indian categories, set monthly budgets, see budget utilization bars, and receive automated savings insights.
+          </p>
+          <a href="{{ url_for('finance_manager.index') }}" class="btn btn-sm btn-outline-primary mt-auto">
+            Track My Money →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     4. FINANCIAL LEARNING INTRODUCTION
+     ========================================================================= -->
+<section class="py-5 bg-white">
+  <div class="container py-lg-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5">
+        <div class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill fw-bold mb-2">Curriculum</div>
+        <h2 class="h1 fw-bold text-dark mb-3">Structured, Beginner-Friendly Financial Education</h2>
+        <p class="text-secondary mb-4" style="line-height: 1.7;">
+          Every lesson in our education centre follows a strict 10-part pedagogical structure: simple definitions, plain-English explanations, INR examples, advantages, risks, common mistakes, FAQs, and instant quizzes.
+        </p>
+        <a href="{{ url_for('education.index') }}" class="btn btn-finbot-primary px-4 py-2">
+          Start Learning Free →
+        </a>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded-4 border bg-light-finbot h-100">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="landmark" class="text-accent" style="width: 20px; height: 20px;"></i>
+                <h6 class="fw-bold text-dark mb-0">A. Banking Fundamentals</h6>
+              </div>
+              <p class="small text-muted mb-0">What is a bank, savings vs current vs salary accounts, UPI, NEFT, IMPS, simple vs compound interest, and inflation.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-4 border bg-light-finbot h-100">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="trending-up" class="text-success" style="width: 20px; height: 20px;"></i>
+                <h6 class="fw-bold text-dark mb-0">B. Investment Education</h6>
+              </div>
+              <p class="small text-muted mb-0">Savings vs investing, mutual funds, SIP compounding, equity vs debt vs index funds, PPF, and NPS.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-4 border bg-light-finbot h-100">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="credit-card" class="text-danger" style="width: 20px; height: 20px;"></i>
+                <h6 class="fw-bold text-dark mb-0">C. Loan Education</h6>
+              </div>
+              <p class="small text-muted mb-0">Home loans, education loans with moratorium, CIBIL scores (300-900), collateral rules, and prepayment math.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-4 border bg-light-finbot h-100">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i data-lucide="pie-chart" class="text-warning-emphasis" style="width: 20px; height: 20px;"></i>
+                <h6 class="fw-bold text-dark mb-0">D. Financial Planning & RBI</h6>
+              </div>
+              <p class="small text-muted mb-0">50/30/20 monthly budgeting, emergency funds, RBI monetary policy (repo rates), and DICGC deposit insurance.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     5. INTERACTIVE CALCULATOR PREVIEW (LIVE ON LANDING PAGE)
+     ========================================================================= -->
+<section class="py-5 bg-light-finbot">
+  <div class="container py-lg-4">
+    <div class="text-center mb-5" style="max-width: 650px; margin: 0 auto;">
+      <div class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold mb-2">Live Demo</div>
+      <h2 class="h1 fw-bold text-dark">Instant Interactive Calculator</h2>
+      <p class="text-muted">Slide the values below to preview how our mathematical calculators work live.</p>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white mx-auto" style="max-width: 850px;">
+      <div class="row align-items-center g-4">
+        <div class="col-md-6">
+          <h5 class="fw-bold text-dark mb-3">Quick Home Loan EMI Preview</h5>
+          
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small text-secondary fw-semibold mb-1">
+              <span>Loan Amount</span>
+              <span id="preview-p-val">₹ 30,00,000</span>
+            </div>
+            <input type="range" class="form-range" id="preview-p-slider" min="500000" max="10000000" step="100000" value="3000000" oninput="updateLandingEMI()" />
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small text-secondary fw-semibold mb-1">
+              <span>Interest Rate</span>
+              <span id="preview-r-val">8.50%</span>
+            </div>
+            <input type="range" class="form-range" id="preview-r-slider" min="7" max="15" step="0.1" value="8.5" oninput="updateLandingEMI()" />
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small text-secondary fw-semibold mb-1">
+              <span>Tenure</span>
+              <span id="preview-t-val">20 Years</span>
+            </div>
+            <input type="range" class="form-range" id="preview-t-slider" min="5" max="30" step="1" value="20" oninput="updateLandingEMI()" />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-4 rounded-4 bg-light-finbot border border-light-subtle text-center">
+            <div class="text-muted small fw-semibold">Estimated Monthly EMI</div>
+            <div class="display-6 fw-bold text-accent my-2" id="preview-emi-res">₹ 26,035</div>
+            <div class="small text-secondary mb-3">
+              Total Interest: <strong class="text-danger" id="preview-int-res">₹ 32,48,400</strong>
+            </div>
+            <a href="{{ url_for('calculators.index') }}" class="btn btn-finbot-primary btn-sm w-100 py-2">
+              Open Full Calculator Suite (7 Tools) →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     6. BANK COMPARISON INTRODUCTION
+     ========================================================================= -->
+<section class="py-5 bg-white">
+  <div class="container py-lg-4">
+    <div class="text-center mb-5" style="max-width: 650px; margin: 0 auto;">
+      <div class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill fw-bold mb-2">Module 4</div>
+      <h2 class="h1 fw-bold text-dark">Compare 10 Top Indian Banks</h2>
+      <p class="text-muted">Starting advertised rates, tenure conditions, and official portals across public and private sector leaders.</p>
+    </div>
+
+    <!-- Bank Badges Row -->
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+      {% for b in ['SBI', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak Bank', 'Bank of Baroda', 'Canara Bank', 'PNB', 'Union Bank', 'Indian Bank'] %}
+      <div class="p-2 px-3 rounded-pill bg-light-finbot border text-dark fw-bold small d-flex align-items-center gap-2">
+        <i data-lucide="landmark" style="width:14px;height:14px;color:var(--accent);"></i>
+        {{ b }}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 text-white" style="background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <h4 class="fw-bold text-white mb-2">Transparent Comparison, Never Hidden Numbers</h4>
+          <p class="text-white-50 mb-0 small" style="line-height: 1.6;">
+            We clearly label starting advertised rates, note required CIBIL score thresholds, and link directly to each bank's official product portal.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <a href="{{ url_for('banks.compare') }}" class="btn btn-light text-dark fw-bold px-4 py-2">
+            Compare Home Loans Now →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     7. AI ASSISTANT PREVIEW
+     ========================================================================= -->
+<section class="py-5 bg-light-finbot">
+  <div class="container py-lg-4">
+    <div class="text-center mb-5" style="max-width: 650px; margin: 0 auto;">
+      <div class="badge bg-purple-soft text-accent px-3 py-1 rounded-pill fw-bold mb-2">Module 6</div>
+      <h2 class="h1 fw-bold text-dark">Meet ArthSaathi AI Assistant</h2>
+      <p class="text-muted">Ask complex financial questions in plain language and get step-by-step guidance.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center" style="max-width: 900px; margin: 0 auto;">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+          <div class="text-accent small fw-bold mb-1">“Explain SIP with a ₹1,000 example”</div>
+          <p class="text-muted small mb-0">ArthSaathi breaks down rupee cost averaging, displays how your corpus grows to ₹5+ Lakh, and explains the compounding formula.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+          <div class="text-accent small fw-bold mb-1">“What happens if I miss my EMI?”</div>
+          <p class="text-muted small mb-0">Explains NACH bounce charges, DPD reporting, CIBIL score damage, the 90-day NPA threshold, and steps to contact your branch.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+          <div class="text-accent small fw-bold mb-1">“SBI vs HDFC home loans?”</div>
+          <p class="text-muted small mb-0">Compares public vs private benefits, EBLR benchmark rates, overdraft facilities (SBI Maxgain), and processing fee waivers.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('chatbot.index') }}" class="btn btn-finbot-primary px-4 py-2">
+        <i data-lucide="message-circle" class="me-1" style="width:16px;height:16px;"></i> Ask ArthSaathi AI Free
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     8. RESPONSIBLE FINANCE NOTICE & DISCLAIMERS BANNER
+     ========================================================================= -->
+<section class="py-4 disclaimer-banner">
+  <div class="container">
+    <div class="d-flex align-items-start gap-3">
+      <i data-lucide="info" class="flex-shrink-0 mt-1" style="width:20px;height:20px;color:var(--accent);"></i>
+      <div class="small">
+        <strong>Important Financial Education Notice:</strong>
+        ArthSaathi AI is an educational platform. Interest rate data displayed across banks is for demonstration and decision support; actual contractual terms depend on individual credit evaluation.
+        Calculations are mathematical estimates. Past investment performance does not guarantee future outcomes.
+        ArthSaathi AI does not provide commercial investment advice or solicit banking deposits.
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function updateLandingEMI() {
+  const P = parseFloat(document.getElementById('preview-p-slider').value);
+  const annualRate = parseFloat(document.getElementById('preview-r-slider').value);
+  const years = parseFloat(document.getElementById('preview-t-slider').value);
+
+  document.getElementById('preview-p-val').textContent = '₹ ' + P.toLocaleString('en-IN');
+  document.getElementById('preview-r-val').textContent = annualRate.toFixed(2) + '%';
+  document.getElementById('preview-t-val').textContent = years + ' Years';
+
+  const n = years * 12;
+  const r = annualRate / 12 / 100;
+  const emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  const totalInterest = (emi * n) - P;
+
+  document.getElementById('preview-emi-res').textContent = '₹ ' + Math.round(emi).toLocaleString('en-IN');
+  document.getElementById('preview-int-res').textContent = '₹ ' + Math.round(totalInterest).toLocaleString('en-IN');
+}
+
+document.addEventListener('DOMContentLoaded', updateLandingEMI);
+</script>
+{% endblock %}

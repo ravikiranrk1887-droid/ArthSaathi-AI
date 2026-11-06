@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% block title %}My Learning Progress — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background: var(--accent);">Module 8</span>
+        <span class="badge bg-secondary-subtle text-dark border">Literacy Journey</span>
+      </div>
+      <h1 class="h2 fw-bold text-dark mb-1">Financial Learning Dashboard</h1>
+      <p class="text-muted mb-0">Track your progress from beginner to advanced personal finance mastery in India.</p>
+    </div>
+    <a href="{{ url_for('education.index') }}" class="btn btn-finbot-primary">
+      <i data-lucide="book-open" class="me-1" style="width:16px;height:16px;"></i> Browse All Lessons
+    </a>
+  </div>
+
+  <!-- Overall Progress & Level Badge Banner -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-white" style="background: linear-gradient(135deg, #0d2137 0%, #1e3a5f 100%);">
+    <div class="row align-items-center g-4">
+      <div class="col-md-8">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-white text-dark fw-bold px-3 py-1 rounded-pill" id="level-badge">
+            BEGINNER LEVEL
+          </span>
+          <span class="text-white-50 small">• Tier 1 Financial Scholar</span>
+        </div>
+        <h3 class="fw-bold text-white mb-2" id="level-headline">Kickstart Your Financial Literacy Journey</h3>
+        <p class="text-white-50 small mb-3" id="level-subtext" style="max-width: 600px;">
+          Complete lessons and score 70%+ on end-of-lesson quizzes to advance your knowledge tier and unlock advanced investing topics.
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="progress flex-grow-1 bg-white-50" style="height: 10px;">
+            <div id="overall-progress-bar" class="progress-bar bg-accent" style="width: 0%;"></div>
+          </div>
+          <span class="fw-bold fs-5 text-white" id="overall-pct-text">0%</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 text-md-end">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 text-center d-inline-block" style="min-width: 160px;">
+          <div class="text-white-50 small fw-semibold">Next Milestone</div>
+          <div class="h4 fw-bold text-white mt-1 mb-0" id="next-milestone">5 Lessons</div>
+          <div class="small text-accent-light mt-1" id="milestone-label">to reach Intermediate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 Stat Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 text-center">
+        <div class="p-2 rounded-3 bg-success-subtle text-success d-inline-block mx-auto mb-2">
+          <i data-lucide="check-circle-2" style="width:22px;height:22px;"></i>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="stat-completed-count">0</div>
+        <div class="text-muted small">Lessons Completed</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 text-center">
+        <div class="p-2 rounded-3 bg-primary-soft text-primary d-inline-block mx-auto mb-2">
+          <i data-lucide="book-marked" style="width:22px;height:22px;"></i>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="stat-available-count">15</div>
+        <div class="text-muted small">Total Lessons in Syllabus</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 text-center">
+        <div class="p-2 rounded-3 bg-purple-soft text-accent d-inline-block mx-auto mb-2">
+          <i data-lucide="award" style="width:22px;height:22px;"></i>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="stat-avg-score">—</div>
+        <div class="text-muted small">Average Quiz Score</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 text-center">
+        <div class="p-2 rounded-3 bg-warning-subtle text-warning-emphasis d-inline-block mx-auto mb-2">
+          <i data-lucide="flame" style="width:22px;height:22px;"></i>
+        </div>
+        <div class="h3 fw-bold text-dark mb-1" id="stat-quizzes-taken">0</div>
+        <div class="text-muted small">Quizzes Attempted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning Journey Tabs -->
+  <ul class="nav nav-pills gap-2 mb-4 p-2 bg-white rounded-4 shadow-sm" id="learningTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active rounded-pill fw-semibold d-flex align-items-center gap-2" id="tab-lessons" data-bs-toggle="pill" data-bs-target="#pane-lessons" type="button">
+        <i data-lucide="list-checks" style="width:16px;height:16px;"></i> All Syllabus Lessons (<span id="tab-lesson-count">0</span>)
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill fw-semibold d-flex align-items-center gap-2" id="tab-quizzes" data-bs-toggle="pill" data-bs-target="#pane-quizzes" type="button">
+        <i data-lucide="history" style="width:16px;height:16px;"></i> Quiz History & Scores
+      </button>
+    </li>
+  </ul>
+
+  <!-- TAB PANES -->
+  <div class="tab-content" id="learningTabContent">
+
+    <!-- 1. ALL LESSONS CHECKLIST -->
+    <div class="tab-pane fade show active" id="pane-lessons" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="fw-bold text-dark mb-0">Indian Financial Education Curriculum</h5>
+          <span class="text-muted small">Click any lesson to study or restart</span>
+        </div>
+        <div id="lessons-checklist" class="d-flex flex-column gap-2">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. QUIZ HISTORY TABLE -->
+    <div class="tab-pane fade" id="pane-quizzes" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="fw-bold text-dark mb-0">Past Quiz Attempts & Performance</h5>
+          <span class="text-muted small">Instant scoring and review recorded in SQLite</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" id="quiz-history-table">
+            <thead class="table-light">
+              <tr>
+                <th>Date Taken</th>
+                <th>Lesson Title</th>
+                <th>Score</th>
+                <th>Percentage</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="quiz-history-tbody">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let completedLessonIds = new Set();
+let quizHistoryList = [];
+let allLessonsList = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadLearningData();
+});
+
+async function loadLearningData() {
+  try {
+    const [progRes, quizRes] = await Promise.all([
+      fetch('/learning/api/learning/progress').then(r => r.json()),
+      fetch('/learning/api/learning/quiz-history').then(r => r.json())
+    ]);
+
+    completedLessonIds = new Set((progRes.data || []).filter(r => r.completed).map(r => r.lesson_id));
+    quizHistoryList = quizRes.data || [];
+
+    // Also fetch all lessons list
+    await fetchLessonsList();
+    updateLearningUI();
+  } catch (err) {
+    console.error("Learning data load error:", err);
+  }
+}
+
+async function fetchLessonsList() {
+  // Static syllabus list matching seeded data
+  allLessonsList = [
+    { id: 1, title: "What is a Bank & How Does Banking Work?", category: "BANKING", slug: "what-is-a-bank-how-it-works", difficulty: "BEGINNER" },
+    { id: 2, title: "Savings Account vs Current Account vs Salary Account", category: "BANKING", slug: "savings-vs-current-vs-salary-account", difficulty: "BEGINNER" },
+    { id: 3, title: "Digital Payments in India: UPI, NEFT, RTGS, IMPS", category: "BANKING", slug: "digital-payments-upi-neft-rtgs-imps", difficulty: "BEGINNER" },
+    { id: 4, title: "Simple vs Compound Interest & Inflation", category: "BANKING", slug: "simple-vs-compound-interest-inflation", difficulty: "BEGINNER" },
+    { id: 5, title: "Saving vs Investing: Why Idle Cash Loses Money", category: "INVESTMENT", slug: "saving-vs-investing-idle-cash", difficulty: "BEGINNER" },
+    { id: 6, title: "What is a Mutual Fund & How Does SIP Work?", category: "INVESTMENT", slug: "what-is-mutual-fund-sip-work", difficulty: "BEGINNER" },
+    { id: 7, title: "Types of Mutual Funds: Equity, Debt, Hybrid & Index Funds", category: "INVESTMENT", slug: "types-of-mutual-funds-equity-debt-index", difficulty: "INTERMEDIATE" },
+    { id: 8, title: "PPF (Public Provident Fund) & NPS (National Pension System)", category: "INVESTMENT", slug: "ppf-and-nps-government-backed-savings", difficulty: "INTERMEDIATE" },
+    { id: 9, title: "Home Loans in India: Fixed vs Floating Rates & Eligibility", category: "LOANS", slug: "home-loans-fixed-vs-floating-eligibility", difficulty: "BEGINNER" },
+    { id: 10, title: "Credit Score & CIBIL: How to Build & Protect It", category: "LOANS", slug: "credit-score-cibil-build-protect", difficulty: "BEGINNER" },
+    { id: 11, title: "Education Loans in India: Moratorium, Collateral & Tax Benefits", category: "LOANS", slug: "education-loans-moratorium-collateral-tax", difficulty: "BEGINNER" },
+    { id: 12, title: "Monthly Budgeting: The 50/30/20 Rule for India", category: "PLANNING", slug: "monthly-budgeting-50-30-20-rule", difficulty: "BEGINNER" },
+    { id: 13, title: "Emergency Funds: Your Financial Shield", category: "PLANNING", slug: "emergency-funds-financial-shield", difficulty: "BEGINNER" },
+    { id: 14, title: "The Reserve Bank of India (RBI) & Monetary Policy", category: "INDIAN_BANKING", slug: "rbi-and-monetary-policy-explained", difficulty: "BEGINNER" },
+    { id: 15, title: "Types of Banks in India: Public, Private, SFBs & Payment Banks", category: "INDIAN_BANKING", slug: "types-of-banks-in-india-psu-private-sfb", difficulty: "BEGINNER" }
+  ];
+}
+
+function updateLearningUI() {
+  const total = allLessonsList.length;
+  const completed = completedLessonIds.size;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById('stat-completed-count').textContent = completed;
+  document.getElementById('stat-available-count').textContent = total;
+  document.getElementById('overall-progress-bar').style.width = `${pct}%`;
+  document.getElementById('overall-pct-text').textContent = `${pct}%`;
+  document.getElementById('tab-lesson-count').textContent = total;
+
+  // Level computation
+  const badge = document.getElementById('level-badge');
+  const headline = document.getElementById('level-headline');
+  const nextMilestone = document.getElementById('next-milestone');
+  const milestoneLabel = document.getElementById('milestone-label');
+
+  if (completed >= 10) {
+    badge.textContent = "ADVANCED FINANCIAL MASTER";
+    badge.className = "badge bg-success text-white fw-bold px-3 py-1 rounded-pill";
+    headline.textContent = "Outstanding! You are in the Top Tier of Financial Literacy";
+    nextMilestone.textContent = "Mastery Reached";
+    milestoneLabel.textContent = "100% Core Syllabus Completed";
+  } else if (completed >= 5) {
+    badge.textContent = "INTERMEDIATE INVESTOR";
+    badge.className = "badge bg-accent text-white fw-bold px-3 py-1 rounded-pill";
+    headline.textContent = "Great Momentum! Intermediate Knowledge Unlocked";
+    nextMilestone.textContent = `${10 - completed} Lessons`;
+    milestoneLabel.textContent = "to reach Advanced Master";
+  } else {
+    badge.textContent = "BEGINNER LEVEL";
+    badge.className = "badge bg-white text-dark fw-bold px-3 py-1 rounded-pill";
+    headline.textContent = "Kickstart Your Financial Literacy Journey";
+    nextMilestone.textContent = `${5 - completed} Lessons`;
+    milestoneLabel.textContent = "to reach Intermediate";
+  }
+
+  // Quiz Stats
+  document.getElementById('stat-quizzes-taken').textContent = quizHistoryList.length;
+  if (quizHistoryList.length > 0) {
+    const avgPct = Math.round(quizHistoryList.reduce((s, q) => s + q.percentage, 0) / quizHistoryList.length);
+    document.getElementById('stat-avg-score').textContent = `${avgPct}%`;
+  } else {
+    document.getElementById('stat-avg-score').textContent = "—";
+  }
+
+  renderLessonsChecklist();
+  renderQuizTable();
+}
+
+function renderLessonsChecklist() {
+  const container = document.getElementById('lessons-checklist');
+  container.innerHTML = '';
+
+  allLessonsList.forEach((item, index) => {
+    const isDone = completedLessonIds.has(item.id);
+    const row = document.createElement('div');
+    row.className = `p-3 rounded-3 border d-flex align-items-center justify-content-between flex-wrap gap-2 ${isDone ? 'bg-success-subtle border-success-subtle' : 'bg-white border-light-subtle'}`;
+
+    row.innerHTML = `
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${isDone ? 'bg-success text-white' : 'bg-light text-secondary border'}" style="width: 32px; height: 32px; font-size: 0.85rem;">
+          ${isDone ? '✓' : index + 1}
+        </div>
+        <div>
+          <a href="/education/lesson/${item.slug}" class="fw-bold text-dark text-decoration-none">
+            ${item.title}
+          </a>
+          <div class="d-flex align-items-center gap-2 mt-1">
+            <span class="badge bg-secondary-subtle text-dark small border">${item.category}</span>
+            <span class="badge bg-light text-secondary small border">${item.difficulty}</span>
+            ${isDone ? '<span class="text-success small fw-semibold">✓ Completed</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        ${isDone ? `
+          <button class="btn btn-sm btn-outline-secondary py-1 px-3 small" onclick="restartLesson(${item.id})">
+            Restart
+          </button>
+        ` : ''}
+        <a href="/education/lesson/${item.slug}" class="btn btn-sm ${isDone ? 'btn-outline-primary' : 'btn-finbot-primary'} py-1 px-3 small">
+          ${isDone ? 'Review' : 'Start Lesson'}
+        </a>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function renderQuizTable() {
+  const tbody = document.getElementById('quiz-history-tbody');
+  tbody.innerHTML = '';
+
+  if (quizHistoryList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No quizzes taken yet. Complete any lesson to take its quiz!</td></tr>`;
+    return;
+  }
+
+  quizHistoryList.forEach(q => {
+    const dateStr = q.taken_at ? new Date(q.taken_at).toLocaleDateString('en-IN') : 'Recent';
+    const isPass = q.percentage >= 60;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="small text-muted">${dateStr}</td>
+      <td class="fw-semibold text-dark">${q.lesson_title}</td>
+      <td><strong>${q.score} / ${q.total}</strong></td>
+      <td><span class="fw-bold ${isPass ? 'text-success' : 'text-danger'}">${q.percentage}%</span></td>
+      <td>
+        <span class="badge ${isPass ? 'bg-success' : 'bg-warning text-dark'} small">
+          ${isPass ? 'PASSED' : 'RETRY NEEDED'}
+        </span>
+      </td>
+      <td>
+        ${q.lesson_slug ? `
+          <a href="/education/lesson/${q.lesson_slug}#quiz-section" class="btn btn-xs btn-outline-primary py-1 px-2 small">
+            Retake Quiz ↺
+          </a>
+        ` : '—'}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function restartLesson(lessonId) {
+  if (!confirm("Do you want to reset completion status for this lesson to retake it?")) return;
+  await fetch('/learning/api/learning/restart', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ lesson_id: lessonId })
+  });
+  loadLearningData();
+}
+</script>
+{% endblock %}

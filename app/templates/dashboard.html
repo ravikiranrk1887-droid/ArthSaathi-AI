@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% block title %}ArthSaathi AI Dashboard — Your Financial Command Centre{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- 1. WELCOME SECTION -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="dash-avatar">
+        <i data-lucide="user" style="width:26px;height:26px;color:var(--accent);"></i>
+      </div>
+      <div>
+        <h1 class="h3 fw-bold text-dark mb-0">Welcome to ArthSaathi AI Dashboard</h1>
+        <p class="text-muted small mb-0">Your personal financial literacy & decision-support command centre</p>
+      </div>
+    </div>
+    <!-- Latest Verified Bank-Rate Badge -->
+    <div class="d-flex align-items-center gap-2 p-2 px-3 rounded-pill bg-white border shadow-xs small">
+      <span class="rounded-circle bg-success d-inline-block" style="width: 8px; height: 8px;"></span>
+      <span class="text-muted">Bank Rates Verified:</span>
+      <strong class="text-dark">Nov 2024 (10 Banks Active)</strong>
+    </div>
+  </div>
+
+  <!-- Key Metric Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <i data-lucide="graduation-cap" class="stat-icon"></i>
+        <div class="stat-value" id="stat-lessons">15</div>
+        <div class="stat-label">Lessons in Curriculum</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <i data-lucide="landmark" class="stat-icon"></i>
+        <div class="stat-value" id="stat-banks">10</div>
+        <div class="stat-label">Indian Banks Covered</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <i data-lucide="calculator" class="stat-icon"></i>
+        <div class="stat-value">7</div>
+        <div class="stat-label">Financial Calculators</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <i data-lucide="award" class="stat-icon" style="color: #10b981;"></i>
+        <div class="stat-value text-success" id="stat-user-progress">0%</div>
+        <div class="stat-label">Your Learning Progress</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning Progress Banner & Daily Financial Tip -->
+  <div class="row g-4 mb-4">
+    <!-- Learning Progress Card -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge" style="background: var(--accent);">Your Progress</span>
+          <span class="small text-white-50" id="dash-lesson-count">0 of 15 completed</span>
+        </div>
+        <h4 class="fw-bold text-white mb-2">Financial Literacy Roadmap</h4>
+        <p class="text-white-50 small mb-3">
+          Master the fundamentals of banking, investing, and loans. Finish your next lesson to advance your tier!
+        </p>
+
+        <div class="progress mb-3 bg-white bg-opacity-25" style="height: 8px;">
+          <div id="dash-prog-bar" class="progress-bar bg-accent" style="width: 0%;"></div>
+        </div>
+
+        <div class="d-flex gap-2 mt-auto">
+          <a href="{{ url_for('education.index') }}" class="btn btn-sm btn-light text-dark fw-bold px-3">
+            Continue Learning →
+          </a>
+          <a href="{{ url_for('learning.index') }}" class="btn btn-sm btn-outline-light px-3">
+            View All Milestones
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Financial Tip Card -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-4 border-warning">
+        <div class="d-flex align-items-center gap-2 mb-2 text-warning-emphasis fw-bold small text-uppercase" style="letter-spacing: .05em;">
+          <i data-lucide="lightbulb" style="width: 18px; height: 18px;"></i>
+          ArthSaathi Financial Tip of the Day
+        </div>
+        <h5 class="fw-bold text-dark mb-2" id="tip-title">The 30% Credit Card Utilization Rule</h5>
+        <p class="text-secondary small mb-3 flex-grow-1" id="tip-body" style="line-height: 1.6;">
+          Never spend more than 30% of your credit card limit. If your limit is ₹1,00,000, keep your monthly billing under ₹30,000. This single habit is responsible for keeping your CIBIL score comfortably above 750!
+        </p>
+        <button class="btn btn-sm btn-outline-secondary" onclick="rotateTip()">
+          <i data-lucide="rotate-cw" style="width: 13px; height: 13px;" class="me-1"></i> Next Financial Tip
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. QUICK ACCESS TO ALL MODULES -->
+  <h2 class="h5 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+    <i data-lucide="grid" class="text-accent" style="width: 18px; height: 18px;"></i>
+    Quick Access to Platform Modules
+  </h2>
+  <div class="row g-3 mb-5">
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('education.index') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-primary-soft">
+            <i data-lucide="graduation-cap" style="color:var(--finbot-navy);"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">Education Centre</div>
+            <div class="text-muted small">Banking, investing & loan lessons</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('investments.index') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-success-soft">
+            <i data-lucide="trending-up" style="color:#10b981;"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">Investment Centre</div>
+            <div class="text-muted small">Stocks, Mutual Funds, PPF, NPS, Gold</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('calculators.index') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-accent-soft">
+            <i data-lucide="calculator" style="color:var(--accent);"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">Financial Calculators (7)</div>
+            <div class="text-muted small">EMI, SIP, FD, RD, Prepayment</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('banks.compare') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-info-soft">
+            <i data-lucide="landmark" style="color:#0284c7;"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">Compare 10 Banks</div>
+            <div class="text-muted small">SBI, HDFC, ICICI, Axis, Kotak, BOB</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('finance_manager.index') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-warning-soft">
+            <i data-lucide="wallet" style="color:#f59e0b;"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">Finance Manager</div>
+            <div class="text-muted small">Income, expenses & monthly budget</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('chatbot.index') }}" class="dash-card-link">
+        <div class="dash-card d-flex align-items-center gap-3">
+          <div class="dash-card-icon bg-purple-soft">
+            <i data-lucide="bot" style="color:var(--accent);"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold text-dark">ArthSaathi AI Assistant</div>
+            <div class="text-muted small">Ask questions in plain English</div>
+          </div>
+          <i data-lucide="chevron-right" class="text-muted" style="width:16px;height:16px;"></i>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Available Calculators & Popular Questions Grid -->
+  <div class="row g-4 mb-4">
+    <!-- Available Calculators Quick Launcher -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <i data-lucide="calculator" class="text-accent" style="width:20px;height:20px;"></i>
+          Available Financial Calculators
+        </h5>
+        <div class="d-flex flex-column gap-2">
+          <a href="{{ url_for('calculators.index') }}" class="p-2 px-3 rounded-3 border bg-light-finbot text-decoration-none d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-semibold small">1. Loan EMI Calculator (Amortization Schedule)</span>
+            <span class="badge bg-white text-dark border">Popular</span>
+          </a>
+          <a href="{{ url_for('calculators.index') }}" class="p-2 px-3 rounded-3 border bg-light-finbot text-decoration-none d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-semibold small">2. Fixed Deposit (FD) Calculator (Quarterly Compounding)</span>
+            <span class="text-muted small">Guaranteed</span>
+          </a>
+          <a href="{{ url_for('calculators.index') }}" class="p-2 px-3 rounded-3 border bg-light-finbot text-decoration-none d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-semibold small">3. Mutual Fund SIP Calculator (Rupee Cost Averaging)</span>
+            <span class="badge bg-success-subtle text-success">Wealth</span>
+          </a>
+          <a href="{{ url_for('calculators.index') }}" class="p-2 px-3 rounded-3 border bg-light-finbot text-decoration-none d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-semibold small">4. Loan Prepayment Calculator (Interest & Time Savings)</span>
+            <span class="badge bg-primary-soft text-primary">Save ₹</span>
+          </a>
+          <a href="{{ url_for('calculators.index') }}" class="p-2 px-3 rounded-3 border bg-light-finbot text-decoration-none d-flex justify-content-between align-items-center">
+            <span class="text-dark fw-semibold small">5. Inflation Impact Calculator (Purchasing Power Loss)</span>
+            <span class="text-muted small">Reality Check</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Questions Direct to ArthSaathi -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <i data-lucide="message-circle" class="text-accent" style="width:20px;height:20px;"></i>
+          Popular Financial Questions
+        </h5>
+        <div class="d-flex flex-column gap-2">
+          <a href="{{ url_for('chatbot.index') }}" class="p-2 px-3 rounded-3 border bg-white text-decoration-none d-flex align-items-center justify-content-between hover-bg">
+            <span class="text-dark small">“Explain SIP with a ₹1,000 monthly example”</span>
+            <i data-lucide="arrow-right" class="text-muted" style="width:14px;height:14px;"></i>
+          </a>
+          <a href="{{ url_for('chatbot.index') }}" class="p-2 px-3 rounded-3 border bg-white text-decoration-none d-flex align-items-center justify-content-between hover-bg">
+            <span class="text-dark small">“What happens if I miss an EMI payment in India?”</span>
+            <i data-lucide="arrow-right" class="text-muted" style="width:14px;height:14px;"></i>
+          </a>
+          <a href="{{ url_for('chatbot.index') }}" class="p-2 px-3 rounded-3 border bg-white text-decoration-none d-flex align-items-center justify-content-between hover-bg">
+            <span class="text-dark small">“What is the difference between FD and RD?”</span>
+            <i data-lucide="arrow-right" class="text-muted" style="width:14px;height:14px;"></i>
+          </a>
+          <a href="{{ url_for('chatbot.index') }}" class="p-2 px-3 rounded-3 border bg-white text-decoration-none d-flex align-items-center justify-content-between hover-bg">
+            <span class="text-dark small">“How much will I repay if I borrow ₹5 Lakh at 9% for 5 years?”</span>
+            <i data-lucide="arrow-right" class="text-muted" style="width:14px;height:14px;"></i>
+          </a>
+          <a href="{{ url_for('chatbot.index') }}" class="p-2 px-3 rounded-3 border bg-white text-decoration-none d-flex align-items-center justify-content-between hover-bg">
+            <span class="text-dark small">“How can I start saving money from my monthly salary?”</span>
+            <i data-lucide="arrow-right" class="text-muted" style="width:14px;height:14px;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const FINANCIAL_TIPS = [
+  {
+    title: "The 30% Credit Card Utilization Rule",
+    body: "Never spend more than 30% of your credit card limit. If your limit is ₹1,00,000, keep your monthly billing under ₹30,000. This single habit is responsible for keeping your CIBIL score comfortably above 750!"
+  },
+  {
+    title: "The Rule of 72 for Doubling Money",
+    body: "Divide 72 by your expected annual interest rate to see how many years it takes to double your investment. At 12% mutual fund returns, your capital doubles in roughly 72 ÷ 12 = 6 years!"
+  },
+  {
+    title: "PPF: The Best Day to Deposit",
+    body: "Always deposit your Public Provident Fund (PPF) money on or before the 5th of each month. In India, PPF interest is calculated on the lowest balance between the 5th and the end of the month."
+  },
+  {
+    title: "Pay Yourself First",
+    body: "Schedule your mutual fund SIP and recurring deposits on the 2nd or 3rd of the month right after salary arrives. Never wait till month-end to save 'whatever is left'—because usually nothing is left!"
+  },
+  {
+    title: "Zero Prepayment Penalty on Floating Home Loans",
+    body: "Under RBI guidelines, banks cannot charge a single rupee of penalty when you prepay a floating-rate home loan. Even paying ₹3,000 extra monthly can shave 5 years off a 20-year loan!"
+  }
+];
+
+let tipIndex = 0;
+function rotateTip() {
+  tipIndex = (tipIndex + 1) % FINANCIAL_TIPS.length;
+  document.getElementById('tip-title').textContent = FINANCIAL_TIPS[tipIndex].title;
+  document.getElementById('tip-body').textContent = FINANCIAL_TIPS[tipIndex].body;
+}
+
+// Fetch user learning progress to update progress bar
+fetch('/learning/api/learning/progress')
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      const completed = d.data.filter(r => r.completed).length;
+      const total = 15;
+      const pct = Math.round((completed / total) * 100);
+      document.getElementById('stat-user-progress').textContent = `${pct}%`;
+      document.getElementById('dash-prog-bar').style.width = `${pct}%`;
+      document.getElementById('dash-lesson-count').textContent = `${completed} of ${total} completed`;
+    }
+  }).catch(() => {});
+</script>
+
+<style>
+.hover-bg:hover {
+  background-color: #f8fafc !important;
+  border-color: var(--accent) !important;
+}
+</style>
+{% endblock %}

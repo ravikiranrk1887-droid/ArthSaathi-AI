@@ -1,0 +1,1265 @@
+{% extends "base.html" %}
+{% block title %}Financial Calculators — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background: var(--accent);">Module 3</span>
+        <span class="badge bg-secondary-subtle text-dark border">Mathematical Decision Tools</span>
+      </div>
+      <h1 class="h2 fw-bold text-dark mb-1">Financial Calculators</h1>
+      <p class="text-muted mb-0">Built using standard Indian banking mathematics & compounding formulas. 100% transparent and reliable.</p>
+    </div>
+    <a href="{{ url_for('chatbot.index') }}" class="btn btn-finbot-primary">
+      <i data-lucide="bot" class="me-1" style="width:16px;height:16px;"></i> Ask ArthSaathi to Explain Math
+    </a>
+  </div>
+
+  <!-- Calculator Navigation Tabs -->
+  <ul class="nav nav-pills gap-2 mb-4 p-2 bg-white rounded-4 shadow-sm overflow-x-auto flex-nowrap" id="calcTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-emi" data-bs-toggle="pill" data-bs-target="#pane-emi" type="button">
+        <i data-lucide="calculator" style="width:16px;height:16px;"></i> Loan EMI
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-fd" data-bs-toggle="pill" data-bs-target="#pane-fd" type="button">
+        <i data-lucide="piggy-bank" style="width:16px;height:16px;"></i> Fixed Deposit (FD)
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-sip" data-bs-toggle="pill" data-bs-target="#pane-sip" type="button">
+        <i data-lucide="trending-up" style="width:16px;height:16px;"></i> SIP Mutual Fund
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-rd" data-bs-toggle="pill" data-bs-target="#pane-rd" type="button">
+        <i data-lucide="layers" style="width:16px;height:16px;"></i> Recurring Deposit (RD)
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-compound" data-bs-toggle="pill" data-bs-target="#pane-compound" type="button">
+        <i data-lucide="refresh-cw" style="width:16px;height:16px;"></i> Compound Interest
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-inflation" data-bs-toggle="pill" data-bs-target="#pane-inflation" type="button">
+        <i data-lucide="alert-triangle" style="width:16px;height:16px;"></i> Inflation Impact
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2" id="tab-prepayment" data-bs-toggle="pill" data-bs-target="#pane-prepayment" type="button">
+        <i data-lucide="scissors" style="width:16px;height:16px;"></i> Loan Prepayment
+      </button>
+    </li>
+  </ul>
+
+  <!-- TAB CONTENT -->
+  <div class="tab-content" id="calcTabContent">
+
+    <!-- ===================================================================
+         1. LOAN EMI CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade show active" id="pane-emi" role="tabpanel">
+      <div class="row g-4">
+        <!-- Input Form -->
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="sliders" class="text-accent" style="width:20px;height:20px;"></i>
+              Loan Parameters
+            </h5>
+
+            <!-- Loan Amount -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Loan Amount (Principal)</label>
+                <div class="input-group input-group-sm" style="max-width: 140px;">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" id="emi-principal-input" class="form-control text-end fw-bold" value="2500000" min="10000" max="100000000" step="10000" />
+                </div>
+              </div>
+              <input type="range" class="form-range" id="emi-principal-slider" min="50000" max="10000000" step="50000" value="2500000" />
+              <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                <span>₹50K</span><span>₹50L</span><span>₹1 Crore</span>
+              </div>
+            </div>
+
+            <!-- Interest Rate -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Interest Rate (p.a.)</label>
+                <div class="input-group input-group-sm" style="max-width: 110px;">
+                  <input type="number" id="emi-rate-input" class="form-control text-end fw-bold" value="8.50" min="0" max="30" step="0.05" />
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+              <input type="range" class="form-range" id="emi-rate-slider" min="0" max="20" step="0.1" value="8.5" />
+              <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                <span>0% (Interest-Free)</span><span>10%</span><span>20%</span>
+              </div>
+            </div>
+
+            <!-- Loan Tenure -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Loan Tenure</label>
+                <div class="input-group input-group-sm" style="max-width: 130px;">
+                  <input type="number" id="emi-tenure-input" class="form-control text-end fw-bold" value="20" min="1" max="35" />
+                  <span class="input-group-text">Years</span>
+                </div>
+              </div>
+              <input type="range" class="form-range" id="emi-tenure-slider" min="1" max="30" step="1" value="20" />
+              <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                <span>1 Year</span><span>15 Years</span><span>30 Years</span>
+              </div>
+            </div>
+
+            <!-- Formula Reference -->
+            <div class="p-3 rounded-3 bg-light-finbot border border-light-subtle small mt-auto">
+              <span class="text-accent fw-semibold">Standard Formula:</span><br/>
+              <code>EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)</code>
+              <p class="text-muted mb-0 mt-1" style="font-size: 0.75rem;">P = Loan amount, r = Monthly rate (Annual/12/100), n = Months.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Cards & Chart -->
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <!-- Results Header Cards -->
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot border border-light-subtle text-center">
+                  <div class="text-muted small fw-semibold">Monthly EMI</div>
+                  <div class="h4 fw-bold text-accent mb-0 mt-1" id="emi-result-monthly">₹ 21,696</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot border border-light-subtle text-center">
+                  <div class="text-muted small fw-semibold">Total Interest</div>
+                  <div class="h4 fw-bold text-danger mb-0 mt-1" id="emi-result-interest">₹ 27,06,944</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot border border-light-subtle text-center">
+                  <div class="text-muted small fw-semibold">Total Repayment</div>
+                  <div class="h4 fw-bold text-dark mb-0 mt-1" id="emi-result-total">₹ 52,06,944</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Donut Chart -->
+            <div class="row align-items-center mb-4">
+              <div class="col-sm-6 text-center">
+                <div style="max-width: 220px; margin: 0 auto; position: relative;">
+                  <canvas id="emi-chart" width="220" height="220"></canvas>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 rounded-3 border border-light-subtle">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="d-flex align-items-center gap-2 small">
+                      <span class="rounded-circle d-inline-block" style="width: 12px; height: 12px; background: #0d2137;"></span>
+                      Principal Loan:
+                    </span>
+                    <strong id="emi-legend-principal">₹ 25,00,000 (48%)</strong>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="d-flex align-items-center gap-2 small">
+                      <span class="rounded-circle d-inline-block" style="width: 12px; height: 12px; background: #7c3aed;"></span>
+                      Total Interest:
+                    </span>
+                    <strong id="emi-legend-interest" class="text-accent">₹ 27,06,944 (52%)</strong>
+                  </div>
+                  <hr class="my-2" />
+                  <div class="small text-muted" id="emi-insight">
+                    ⚠️ You will pay <strong>1.08x</strong> your principal in interest over 20 years. Consider prepayments to save thousands!
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amortization Schedule Accordion -->
+            <div class="accordion" id="amortizationAccordion">
+              <div class="accordion-item border border-light-subtle rounded-3 overflow-hidden">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed fw-semibold text-dark bg-light-finbot" type="button" data-bs-toggle="collapse" data-bs-target="#amortizationCollapse">
+                    <i data-lucide="table" class="me-2" style="width: 16px; height: 16px;"></i>
+                    View Year-by-Year Amortization Schedule
+                  </button>
+                </h2>
+                <div id="amortizationCollapse" class="accordion-collapse collapse" data-bs-parent="#amortizationAccordion">
+                  <div class="accordion-body p-0">
+                    <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+                      <table class="table table-sm table-hover mb-0 text-center" style="font-size: 0.82rem;">
+                        <thead class="table-light sticky-top">
+                          <tr>
+                            <th>Year</th>
+                            <th>Principal Paid</th>
+                            <th>Interest Paid</th>
+                            <th>Total Annual</th>
+                            <th>Remaining Balance</th>
+                          </tr>
+                        </thead>
+                        <tbody id="emi-amortization-body">
+                          <!-- Populated via JS -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         2. FIXED DEPOSIT (FD) CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-fd" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="piggy-bank" class="text-accent" style="width:20px;height:20px;"></i>
+              FD Deposit Details
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Deposit Amount (₹)</label>
+                <input type="number" id="fd-principal-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 140px;" value="500000" min="1000" max="10000000" step="5000" />
+              </div>
+              <input type="range" class="form-range" id="fd-principal-slider" min="10000" max="5000000" step="10000" value="500000" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Annual Interest Rate (%)</label>
+                <input type="number" id="fd-rate-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="7.25" min="1" max="15" step="0.05" />
+              </div>
+              <input type="range" class="form-range" id="fd-rate-slider" min="3" max="12" step="0.1" value="7.25" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Duration (Years)</label>
+                <input type="number" id="fd-tenure-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="3" min="1" max="10" />
+              </div>
+              <input type="range" class="form-range" id="fd-tenure-slider" min="1" max="10" step="1" value="3" />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-semibold text-secondary">Compounding Frequency</label>
+              <select id="fd-freq-select" class="form-select form-select-sm">
+                <option value="4" selected>Quarterly (Standard in Indian Banks)</option>
+                <option value="12">Monthly</option>
+                <option value="2">Half-Yearly</option>
+                <option value="1">Annually</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Total Deposit</div>
+                  <div class="h4 fw-bold text-dark mt-1 mb-0" id="fd-result-principal">₹ 5,00,000</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Interest Earned</div>
+                  <div class="h4 fw-bold text-success mt-1 mb-0" id="fd-result-interest">₹ 1,19,997</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Maturity Value</div>
+                  <div class="h4 fw-bold text-accent mt-1 mb-0" id="fd-result-maturity">₹ 6,19,997</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row align-items-center">
+              <div class="col-sm-6 text-center">
+                <div style="max-width: 220px; margin: 0 auto;">
+                  <canvas id="fd-chart" width="220" height="220"></canvas>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="alert alert-info small mb-0">
+                  <i data-lucide="info" class="me-1" style="width:14px;height:14px;"></i>
+                  <strong>TDS Reminder:</strong> If annual FD interest exceeds ₹40,000 (₹50,000 for seniors), the bank will deduct 10% TDS unless Form 15G/15H is submitted.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         3. SIP CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-sip" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="trending-up" class="text-accent" style="width:20px;height:20px;"></i>
+              SIP Investment Plan
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Monthly Investment (₹)</label>
+                <input type="number" id="sip-monthly-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 140px;" value="10000" min="500" max="1000000" step="500" />
+              </div>
+              <input type="range" class="form-range" id="sip-monthly-slider" min="500" max="100000" step="500" value="10000" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Expected Annual Return (%)</label>
+                <input type="number" id="sip-rate-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="12.0" min="1" max="30" step="0.5" />
+              </div>
+              <input type="range" class="form-range" id="sip-rate-slider" min="5" max="25" step="0.5" value="12" />
+              <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                <span>Conservative (8%)</span><span>Moderate (12%)</span><span>Aggressive (15%+)</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Investment Duration (Years)</label>
+                <input type="number" id="sip-tenure-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="15" min="1" max="40" />
+              </div>
+              <input type="range" class="form-range" id="sip-tenure-slider" min="1" max="35" step="1" value="15" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Total Invested</div>
+                  <div class="h4 fw-bold text-dark mt-1 mb-0" id="sip-result-invested">₹ 18,00,000</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Estimated Gains</div>
+                  <div class="h4 fw-bold text-success mt-1 mb-0" id="sip-result-gains">₹ 32,45,760</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Estimated Corpus</div>
+                  <div class="h4 fw-bold text-accent mt-1 mb-0" id="sip-result-corpus">₹ 50,45,760</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row align-items-center mb-3">
+              <div class="col-sm-6 text-center">
+                <div style="max-width: 220px; margin: 0 auto;">
+                  <canvas id="sip-chart" width="220" height="220"></canvas>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 rounded-3 border border-light-subtle small">
+                  <div class="text-success fw-bold mb-1">Power of Compounding:</div>
+                  <p class="text-muted mb-0">Your returns (₹ <span id="sip-gain-pct">180%</span>) are nearly double what you deposited out of pocket! That is the advantage of remaining invested long-term.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-warning border-0 small mb-0 py-2">
+              <i data-lucide="alert-triangle" class="me-1" style="width:13px;height:13px;"></i>
+              <strong>Disclaimer:</strong> Mutual fund investments are subject to market risks. Returns shown are mathematical estimates, not guaranteed outcomes.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         4. RECURRING DEPOSIT (RD) CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-rd" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="layers" class="text-accent" style="width:20px;height:20px;"></i>
+              RD Deposit Details
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Monthly Deposit (₹)</label>
+                <input type="number" id="rd-monthly-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 140px;" value="5000" min="500" max="500000" step="500" />
+              </div>
+              <input type="range" class="form-range" id="rd-monthly-slider" min="500" max="50000" step="500" value="5000" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Interest Rate (%)</label>
+                <input type="number" id="rd-rate-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="7.0" min="1" max="12" step="0.1" />
+              </div>
+              <input type="range" class="form-range" id="rd-rate-slider" min="3" max="10" step="0.1" value="7.0" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Tenure (Months)</label>
+                <input type="number" id="rd-months-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="24" min="6" max="120" />
+              </div>
+              <input type="range" class="form-range" id="rd-months-slider" min="6" max="60" step="6" value="24" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Total Deposited</div>
+                  <div class="h4 fw-bold text-dark mt-1 mb-0" id="rd-result-deposited">₹ 1,20,000</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Estimated Interest</div>
+                  <div class="h4 fw-bold text-success mt-1 mb-0" id="rd-result-interest">₹ 9,140</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Maturity Value</div>
+                  <div class="h4 fw-bold text-accent mt-1 mb-0" id="rd-result-maturity">₹ 1,29,140</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center">
+              <div style="max-width: 220px; margin: 0 auto;">
+                <canvas id="rd-chart" width="220" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         5. COMPOUND INTEREST CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-compound" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="refresh-cw" class="text-accent" style="width:20px;height:20px;"></i>
+              Compounding Setup
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Initial Principal (₹)</label>
+                <input type="number" id="comp-principal-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 140px;" value="100000" min="1000" max="10000000" />
+              </div>
+              <input type="range" class="form-range" id="comp-principal-slider" min="10000" max="2000000" step="10000" value="100000" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Annual Interest Rate (%)</label>
+                <input type="number" id="comp-rate-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="8.0" min="0" max="30" step="0.1" />
+              </div>
+              <input type="range" class="form-range" id="comp-rate-slider" min="1" max="20" step="0.5" value="8.0" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Time Period (Years)</label>
+                <input type="number" id="comp-years-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="10" min="1" max="40" />
+              </div>
+              <input type="range" class="form-range" id="comp-years-slider" min="1" max="30" step="1" value="10" />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-semibold text-secondary">Compounding Frequency</label>
+              <select id="comp-freq-select" class="form-select form-select-sm">
+                <option value="12">Monthly (12 times/yr)</option>
+                <option value="4" selected>Quarterly (4 times/yr)</option>
+                <option value="2">Semi-Annually (2 times/yr)</option>
+                <option value="1">Annually (1 time/yr)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Initial Principal</div>
+                  <div class="h4 fw-bold text-dark mt-1 mb-0" id="comp-result-principal">₹ 1,00,000</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Interest Earned</div>
+                  <div class="h4 fw-bold text-success mt-1 mb-0" id="comp-result-interest">₹ 1,20,804</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Total Amount</div>
+                  <div class="h4 fw-bold text-accent mt-1 mb-0" id="comp-result-amount">₹ 2,20,804</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center">
+              <div style="max-width: 220px; margin: 0 auto;">
+                <canvas id="comp-chart" width="220" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         6. INFLATION IMPACT CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-inflation" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="alert-triangle" class="text-warning" style="width:20px;height:20px;"></i>
+              Inflation Parameters
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Current Cost / Value (₹)</label>
+                <input type="number" id="inf-amount-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 140px;" value="100000" min="1000" max="10000000" />
+              </div>
+              <input type="range" class="form-range" id="inf-amount-slider" min="10000" max="1000000" step="10000" value="100000" />
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Inflation Rate (%)</label>
+                <input type="number" id="inf-rate-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="6.0" min="1" max="15" step="0.5" />
+              </div>
+              <input type="range" class="form-range" id="inf-rate-slider" min="2" max="12" step="0.5" value="6.0" />
+              <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                <span>Low (4%)</span><span>Average India (6%)</span><span>High (8%+)</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <label class="form-label small fw-semibold text-secondary">Number of Years</label>
+                <input type="number" id="inf-years-input" class="form-control form-control-sm text-end fw-bold" style="max-width: 110px;" value="15" min="1" max="40" />
+              </div>
+              <input type="range" class="form-range" id="inf-years-slider" min="1" max="30" step="1" value="15" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Current Value</div>
+                  <div class="h4 fw-bold text-dark mt-1 mb-0" id="inf-result-original">₹ 1,00,000</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Future Cost Needed</div>
+                  <div class="h4 fw-bold text-danger mt-1 mb-0" id="inf-result-future">₹ 2,39,656</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3 bg-light-finbot text-center">
+                  <div class="text-muted small">Purchasing Power</div>
+                  <div class="h4 fw-bold text-warning-emphasis mt-1 mb-0" id="inf-result-power">₹ 41,727</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-3 border border-light-subtle bg-light-finbot mb-3">
+              <h6 class="fw-bold text-dark mb-1">The Reality of Inflation:</h6>
+              <p class="small text-muted mb-0" id="inf-summary-text">
+                What costs ₹1,00,000 today will cost <strong>₹2,39,656</strong> in 15 years.
+                Conversely, ₹1,00,000 kept idle in cash will buy only <strong>₹41,727</strong> worth of goods in today's terms. You lose <strong>₹58,273</strong> in real purchasing power!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         7. LOAN PREPAYMENT CALCULATOR
+         =================================================================== -->
+    <div class="tab-pane fade" id="pane-prepayment" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="scissors" class="text-accent" style="width:20px;height:20px;"></i>
+              Current Loan & Prepayment
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary">Outstanding Loan Principal (₹)</label>
+              <input type="number" id="prep-principal-input" class="form-control form-control-sm fw-bold" value="3000000" min="50000" step="50000" />
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small fw-semibold text-secondary">Interest Rate (%)</label>
+                <input type="number" id="prep-rate-input" class="form-control form-control-sm fw-bold" value="8.50" step="0.05" />
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold text-secondary">Remaining Months</label>
+                <input type="number" id="prep-months-input" class="form-control form-control-sm fw-bold" value="240" min="6" max="360" />
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <h6 class="fw-bold text-accent small text-uppercase">Prepayment Options</h6>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary">Extra Monthly Payment (₹)</label>
+              <input type="number" id="prep-extra-monthly" class="form-control form-control-sm fw-bold text-success" value="3000" min="0" step="500" placeholder="e.g. ₹3,000/mo extra" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold text-secondary">One-Time Lump Sum Prepayment (₹)</label>
+              <input type="number" id="prep-lump-sum" class="form-control form-control-sm fw-bold text-primary" value="100000" min="0" step="10000" placeholder="e.g. ₹1,00,000 from bonus" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3">Your Prepayment Savings Summary</h5>
+
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <div class="p-3 rounded-3 bg-success-subtle text-success-emphasis text-center border border-success-subtle">
+                  <div class="small fw-semibold">Total Interest Saved</div>
+                  <div class="h3 fw-bold mt-1 mb-0" id="prep-saved-interest">₹ 7,85,420</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 rounded-3 bg-primary-soft text-primary text-center border border-primary-subtle">
+                  <div class="small fw-semibold">Time Saved (Tenure Reduced)</div>
+                  <div class="h3 fw-bold mt-1 mb-0" id="prep-saved-time">58 Months (4.8 Yrs)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm small align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Detail</th>
+                    <th>Without Prepayment</th>
+                    <th>With Prepayment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Monthly EMI</td>
+                    <td id="prep-orig-emi">₹ 26,035</td>
+                    <td id="prep-new-emi" class="fw-bold text-success">₹ 29,035</td>
+                  </tr>
+                  <tr>
+                    <td>Loan Duration</td>
+                    <td id="prep-orig-tenure">240 Months (20 Yrs)</td>
+                    <td id="prep-new-tenure" class="fw-bold text-primary">182 Months (15.2 Yrs)</td>
+                  </tr>
+                  <tr>
+                    <td>Total Repayment</td>
+                    <td id="prep-orig-total">₹ 62,48,400</td>
+                    <td id="prep-new-total" class="fw-bold text-dark">₹ 54,62,980</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-info small mt-auto mb-0">
+              <i data-lucide="check-circle" class="me-1" style="width:14px;height:14px;"></i>
+              <strong>RBI Rule:</strong> Individual floating-rate home loans cannot be charged prepayment penalties. You can prepay as often as you want!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Format currency in INR
+function fmtINR(val) {
+  return '₹ ' + Math.round(val).toLocaleString('en-IN');
+}
+
+// -----------------------------------------------------------------------------
+// 1. EMI CALCULATOR
+// -----------------------------------------------------------------------------
+let emiChart = null;
+
+function updateEMI() {
+  const P = parseFloat(document.getElementById('emi-principal-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('emi-rate-input').value) || 0;
+  const years = parseFloat(document.getElementById('emi-tenure-input').value) || 0;
+  const n = Math.round(years * 12);
+
+  if (P <= 0 || n <= 0) return;
+
+  let emi = 0;
+  let totalPayment = 0;
+  let totalInterest = 0;
+
+  if (annualRate === 0) {
+    emi = P / n;
+    totalPayment = P;
+    totalInterest = 0;
+  } else {
+    const r = annualRate / 12 / 100;
+    emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+    totalPayment = emi * n;
+    totalInterest = totalPayment - P;
+  }
+
+  document.getElementById('emi-result-monthly').textContent = fmtINR(emi);
+  document.getElementById('emi-result-interest').textContent = fmtINR(totalInterest);
+  document.getElementById('emi-result-total').textContent = fmtINR(totalPayment);
+
+  const principalPct = Math.round((P / totalPayment) * 100);
+  const interestPct = 100 - principalPct;
+  document.getElementById('emi-legend-principal').textContent = `${fmtINR(P)} (${principalPct}%)`;
+  document.getElementById('emi-legend-interest').textContent = `${fmtINR(totalInterest)} (${interestPct}%)`;
+
+  const ratio = (totalInterest / P).toFixed(2);
+  document.getElementById('emi-insight').innerHTML = `⚠️ You will pay <strong>${ratio}x</strong> your principal in interest over ${years} years.`;
+
+  // Update or build chart
+  const ctx = document.getElementById('emi-chart').getContext('2d');
+  if (emiChart) {
+    emiChart.data.datasets[0].data = [P, Math.round(totalInterest)];
+    emiChart.update();
+  } else {
+    emiChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Principal Loan', 'Total Interest'],
+        datasets: [{
+          data: [P, Math.round(totalInterest)],
+          backgroundColor: ['#0d2137', '#7c3aed'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        cutout: '72%'
+      }
+    });
+  }
+
+  // Generate Year-by-Year Amortization
+  const tbody = document.getElementById('emi-amortization-body');
+  tbody.innerHTML = '';
+  let balance = P;
+  const r = annualRate / 12 / 100;
+
+  for (let yr = 1; yr <= years; yr++) {
+    let yrPrincipal = 0;
+    let yrInterest = 0;
+    for (let m = 1; m <= 12; m++) {
+      if (balance <= 0) break;
+      const intComp = annualRate === 0 ? 0 : balance * r;
+      const prinComp = emi - intComp;
+      yrInterest += intComp;
+      yrPrincipal += prinComp;
+      balance = Math.max(balance - prinComp, 0);
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>Year ${yr}</strong></td>
+      <td class="text-dark">${fmtINR(yrPrincipal)}</td>
+      <td class="text-accent">${fmtINR(yrInterest)}</td>
+      <td>${fmtINR(yrPrincipal + yrInterest)}</td>
+      <td class="text-secondary">${fmtINR(balance)}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// Sync sliders and inputs for EMI
+document.getElementById('emi-principal-slider').addEventListener('input', function() {
+  document.getElementById('emi-principal-input').value = this.value;
+  updateEMI();
+});
+document.getElementById('emi-principal-input').addEventListener('input', function() {
+  document.getElementById('emi-principal-slider').value = this.value;
+  updateEMI();
+});
+document.getElementById('emi-rate-slider').addEventListener('input', function() {
+  document.getElementById('emi-rate-input').value = this.value;
+  updateEMI();
+});
+document.getElementById('emi-rate-input').addEventListener('input', function() {
+  document.getElementById('emi-rate-slider').value = this.value;
+  updateEMI();
+});
+document.getElementById('emi-tenure-slider').addEventListener('input', function() {
+  document.getElementById('emi-tenure-input').value = this.value;
+  updateEMI();
+});
+document.getElementById('emi-tenure-input').addEventListener('input', function() {
+  document.getElementById('emi-tenure-slider').value = this.value;
+  updateEMI();
+});
+
+// -----------------------------------------------------------------------------
+// 2. FD CALCULATOR
+// -----------------------------------------------------------------------------
+let fdChart = null;
+
+function updateFD() {
+  const P = parseFloat(document.getElementById('fd-principal-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('fd-rate-input').value) || 0;
+  const years = parseFloat(document.getElementById('fd-tenure-input').value) || 0;
+  const n = parseInt(document.getElementById('fd-freq-select').value) || 4;
+
+  const r = annualRate / 100;
+  const maturity = P * Math.pow(1 + r / n, n * years);
+  const interest = maturity - P;
+
+  document.getElementById('fd-result-principal').textContent = fmtINR(P);
+  document.getElementById('fd-result-interest').textContent = fmtINR(interest);
+  document.getElementById('fd-result-maturity').textContent = fmtINR(maturity);
+
+  const ctx = document.getElementById('fd-chart').getContext('2d');
+  if (fdChart) {
+    fdChart.data.datasets[0].data = [P, Math.round(interest)];
+    fdChart.update();
+  } else {
+    fdChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Deposit Amount', 'Interest Earned'],
+        datasets: [{
+          data: [P, Math.round(interest)],
+          backgroundColor: ['#0d2137', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        cutout: '72%'
+      }
+    });
+  }
+}
+
+document.getElementById('fd-principal-slider').addEventListener('input', function() {
+  document.getElementById('fd-principal-input').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-principal-input').addEventListener('input', function() {
+  document.getElementById('fd-principal-slider').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-rate-slider').addEventListener('input', function() {
+  document.getElementById('fd-rate-input').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-rate-input').addEventListener('input', function() {
+  document.getElementById('fd-rate-slider').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-tenure-slider').addEventListener('input', function() {
+  document.getElementById('fd-tenure-input').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-tenure-input').addEventListener('input', function() {
+  document.getElementById('fd-tenure-slider').value = this.value;
+  updateFD();
+});
+document.getElementById('fd-freq-select').addEventListener('change', updateFD);
+
+// -----------------------------------------------------------------------------
+// 3. SIP CALCULATOR
+// -----------------------------------------------------------------------------
+let sipChart = null;
+
+function updateSIP() {
+  const P = parseFloat(document.getElementById('sip-monthly-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('sip-rate-input').value) || 0;
+  const years = parseFloat(document.getElementById('sip-tenure-input').value) || 0;
+
+  const n = years * 12;
+  const i = annualRate / 12 / 100;
+  const totalInvested = P * n;
+
+  let fv = 0;
+  if (i === 0) {
+    fv = totalInvested;
+  } else {
+    fv = P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
+  }
+  const gains = fv - totalInvested;
+
+  document.getElementById('sip-result-invested').textContent = fmtINR(totalInvested);
+  document.getElementById('sip-result-gains').textContent = fmtINR(gains);
+  document.getElementById('sip-result-corpus').textContent = fmtINR(fv);
+  document.getElementById('sip-gain-pct').textContent = totalInvested > 0 ? Math.round((gains / totalInvested) * 100) + '%' : '0%';
+
+  const ctx = document.getElementById('sip-chart').getContext('2d');
+  if (sipChart) {
+    sipChart.data.datasets[0].data = [totalInvested, Math.round(gains)];
+    sipChart.update();
+  } else {
+    sipChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Total Invested', 'Estimated Gains'],
+        datasets: [{
+          data: [totalInvested, Math.round(gains)],
+          backgroundColor: ['#0d2137', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        cutout: '72%'
+      }
+    });
+  }
+}
+
+document.getElementById('sip-monthly-slider').addEventListener('input', function() {
+  document.getElementById('sip-monthly-input').value = this.value;
+  updateSIP();
+});
+document.getElementById('sip-monthly-input').addEventListener('input', function() {
+  document.getElementById('sip-monthly-slider').value = this.value;
+  updateSIP();
+});
+document.getElementById('sip-rate-slider').addEventListener('input', function() {
+  document.getElementById('sip-rate-input').value = this.value;
+  updateSIP();
+});
+document.getElementById('sip-rate-input').addEventListener('input', function() {
+  document.getElementById('sip-rate-slider').value = this.value;
+  updateSIP();
+});
+document.getElementById('sip-tenure-slider').addEventListener('input', function() {
+  document.getElementById('sip-tenure-input').value = this.value;
+  updateSIP();
+});
+document.getElementById('sip-tenure-input').addEventListener('input', function() {
+  document.getElementById('sip-tenure-slider').value = this.value;
+  updateSIP();
+});
+
+// -----------------------------------------------------------------------------
+// 4. RD CALCULATOR
+// -----------------------------------------------------------------------------
+let rdChart = null;
+
+function updateRD() {
+  const P = parseFloat(document.getElementById('rd-monthly-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('rd-rate-input').value) || 0;
+  const months = parseInt(document.getElementById('rd-months-input').value) || 0;
+
+  const r = annualRate / 4 / 100;
+  let maturity = 0;
+  for (let i = 0; i < months; i++) {
+    const quarters = (months - i) / 3;
+    maturity += P * Math.pow(1 + r, quarters);
+  }
+  const totalDeposited = P * months;
+  const interest = maturity - totalDeposited;
+
+  document.getElementById('rd-result-deposited').textContent = fmtINR(totalDeposited);
+  document.getElementById('rd-result-interest').textContent = fmtINR(interest);
+  document.getElementById('rd-result-maturity').textContent = fmtINR(maturity);
+
+  const ctx = document.getElementById('rd-chart').getContext('2d');
+  if (rdChart) {
+    rdChart.data.datasets[0].data = [totalDeposited, Math.round(interest)];
+    rdChart.update();
+  } else {
+    rdChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Total Deposited', 'Estimated Interest'],
+        datasets: [{
+          data: [totalDeposited, Math.round(interest)],
+          backgroundColor: ['#0d2137', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        cutout: '72%'
+      }
+    });
+  }
+}
+
+document.getElementById('rd-monthly-slider').addEventListener('input', function() {
+  document.getElementById('rd-monthly-input').value = this.value;
+  updateRD();
+});
+document.getElementById('rd-monthly-input').addEventListener('input', function() {
+  document.getElementById('rd-monthly-slider').value = this.value;
+  updateRD();
+});
+document.getElementById('rd-rate-slider').addEventListener('input', function() {
+  document.getElementById('rd-rate-input').value = this.value;
+  updateRD();
+});
+document.getElementById('rd-rate-input').addEventListener('input', function() {
+  document.getElementById('rd-rate-slider').value = this.value;
+  updateRD();
+});
+document.getElementById('rd-months-slider').addEventListener('input', function() {
+  document.getElementById('rd-months-input').value = this.value;
+  updateRD();
+});
+document.getElementById('rd-months-input').addEventListener('input', function() {
+  document.getElementById('rd-months-slider').value = this.value;
+  updateRD();
+});
+
+// -----------------------------------------------------------------------------
+// 5. COMPOUND INTEREST CALCULATOR
+// -----------------------------------------------------------------------------
+let compChart = null;
+
+function updateCompound() {
+  const P = parseFloat(document.getElementById('comp-principal-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('comp-rate-input').value) || 0;
+  const years = parseFloat(document.getElementById('comp-years-input').value) || 0;
+  const n = parseInt(document.getElementById('comp-freq-select').value) || 4;
+
+  const r = annualRate / 100;
+  const amount = P * Math.pow(1 + r / n, n * years);
+  const interest = amount - P;
+
+  document.getElementById('comp-result-principal').textContent = fmtINR(P);
+  document.getElementById('comp-result-interest').textContent = fmtINR(interest);
+  document.getElementById('comp-result-amount').textContent = fmtINR(amount);
+
+  const ctx = document.getElementById('comp-chart').getContext('2d');
+  if (compChart) {
+    compChart.data.datasets[0].data = [P, Math.round(interest)];
+    compChart.update();
+  } else {
+    compChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Initial Principal', 'Interest Earned'],
+        datasets: [{
+          data: [P, Math.round(interest)],
+          backgroundColor: ['#0d2137', '#7c3aed'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        cutout: '72%'
+      }
+    });
+  }
+}
+
+document.getElementById('comp-principal-slider').addEventListener('input', function() {
+  document.getElementById('comp-principal-input').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-principal-input').addEventListener('input', function() {
+  document.getElementById('comp-principal-slider').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-rate-slider').addEventListener('input', function() {
+  document.getElementById('comp-rate-input').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-rate-input').addEventListener('input', function() {
+  document.getElementById('comp-rate-slider').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-years-slider').addEventListener('input', function() {
+  document.getElementById('comp-years-input').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-years-input').addEventListener('input', function() {
+  document.getElementById('comp-years-slider').value = this.value;
+  updateCompound();
+});
+document.getElementById('comp-freq-select').addEventListener('change', updateCompound);
+
+// -----------------------------------------------------------------------------
+// 6. INFLATION CALCULATOR
+// -----------------------------------------------------------------------------
+function updateInflation() {
+  const amount = parseFloat(document.getElementById('inf-amount-input').value) || 0;
+  const rate = parseFloat(document.getElementById('inf-rate-input').value) || 0;
+  const years = parseInt(document.getElementById('inf-years-input').value) || 0;
+
+  const futureCost = amount * Math.pow(1 + rate / 100, years);
+  const purchasingPower = amount / Math.pow(1 + rate / 100, years);
+  const valueLost = amount - purchasingPower;
+
+  document.getElementById('inf-result-original').textContent = fmtINR(amount);
+  document.getElementById('inf-result-future').textContent = fmtINR(futureCost);
+  document.getElementById('inf-result-power').textContent = fmtINR(purchasingPower);
+
+  document.getElementById('inf-summary-text').innerHTML = `
+    What costs <strong>${fmtINR(amount)}</strong> today will cost <strong>${fmtINR(futureCost)}</strong> in ${years} years.
+    Conversely, ${fmtINR(amount)} kept idle in cash will buy only <strong>${fmtINR(purchasingPower)}</strong> worth of goods in today's terms. You lose <strong>${fmtINR(valueLost)}</strong> in real purchasing power!
+  `;
+}
+
+document.getElementById('inf-amount-slider').addEventListener('input', function() {
+  document.getElementById('inf-amount-input').value = this.value;
+  updateInflation();
+});
+document.getElementById('inf-amount-input').addEventListener('input', function() {
+  document.getElementById('inf-amount-slider').value = this.value;
+  updateInflation();
+});
+document.getElementById('inf-rate-slider').addEventListener('input', function() {
+  document.getElementById('inf-rate-input').value = this.value;
+  updateInflation();
+});
+document.getElementById('inf-rate-input').addEventListener('input', function() {
+  document.getElementById('inf-rate-slider').value = this.value;
+  updateInflation();
+});
+document.getElementById('inf-years-slider').addEventListener('input', function() {
+  document.getElementById('inf-years-input').value = this.value;
+  updateInflation();
+});
+document.getElementById('inf-years-input').addEventListener('input', function() {
+  document.getElementById('inf-years-slider').value = this.value;
+  updateInflation();
+});
+
+// -----------------------------------------------------------------------------
+// 7. PREPAYMENT CALCULATOR
+// -----------------------------------------------------------------------------
+function updatePrepayment() {
+  const P = parseFloat(document.getElementById('prep-principal-input').value) || 0;
+  const annualRate = parseFloat(document.getElementById('prep-rate-input').value) || 0;
+  const remainingMonths = parseInt(document.getElementById('prep-months-input').value) || 0;
+  const extraMonthly = parseFloat(document.getElementById('prep-extra-monthly').value) || 0;
+  const lumpSum = parseFloat(document.getElementById('prep-lump-sum').value) || 0;
+
+  if (P <= 0 || remainingMonths <= 0) return;
+
+  const r = annualRate / 12 / 100;
+  const origEmi = annualRate === 0 ? P / remainingMonths : P * r * Math.pow(1 + r, remainingMonths) / (Math.pow(1 + r, remainingMonths) - 1);
+  const origTotal = origEmi * remainingMonths;
+  const origInterest = origTotal - P;
+
+  const newP = Math.max(P - lumpSum, 0);
+  let newMonths = remainingMonths;
+  let newEmi = origEmi + extraMonthly;
+  let newTotal = 0;
+
+  if (newP <= 0) {
+    newMonths = 0;
+    newTotal = lumpSum;
+  } else if (extraMonthly > 0) {
+    if (r > 0) {
+      try {
+        newMonths = Math.ceil(Math.log(newEmi / (newEmi - newP * r)) / Math.log(1 + r));
+      } catch (e) {
+        newMonths = remainingMonths;
+      }
+    } else {
+      newMonths = Math.ceil(newP / newEmi);
+    }
+    newTotal = newEmi * newMonths + lumpSum;
+  } else {
+    const newCalcEmi = annualRate === 0 ? newP / remainingMonths : newP * r * Math.pow(1 + r, remainingMonths) / (Math.pow(1 + r, remainingMonths) - 1);
+    newTotal = newCalcEmi * remainingMonths + lumpSum;
+    newEmi = newCalcEmi;
+  }
+
+  const interestSaved = Math.max(origTotal - newTotal, 0);
+  const monthsSaved = Math.max(remainingMonths - newMonths, 0);
+  const yearsSaved = (monthsSaved / 12).toFixed(1);
+
+  document.getElementById('prep-saved-interest').textContent = fmtINR(interestSaved);
+  document.getElementById('prep-saved-time').textContent = `${monthsSaved} Months (${yearsSaved} Yrs)`;
+
+  document.getElementById('prep-orig-emi').textContent = fmtINR(origEmi);
+  document.getElementById('prep-new-emi').textContent = fmtINR(newEmi);
+  document.getElementById('prep-orig-tenure').textContent = `${remainingMonths} Months (${(remainingMonths/12).toFixed(1)} Yrs)`;
+  document.getElementById('prep-new-tenure').textContent = `${newMonths} Months (${(newMonths/12).toFixed(1)} Yrs)`;
+  document.getElementById('prep-orig-total').textContent = fmtINR(origTotal);
+  document.getElementById('prep-new-total').textContent = fmtINR(newTotal);
+}
+
+document.getElementById('prep-principal-input').addEventListener('input', updatePrepayment);
+document.getElementById('prep-rate-input').addEventListener('input', updatePrepayment);
+document.getElementById('prep-months-input').addEventListener('input', updatePrepayment);
+document.getElementById('prep-extra-monthly').addEventListener('input', updatePrepayment);
+document.getElementById('prep-lump-sum').addEventListener('input', updatePrepayment);
+
+// Initialize calculations on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateEMI();
+  updateFD();
+  updateSIP();
+  updateRD();
+  updateCompound();
+  updateInflation();
+  updatePrepayment();
+});
+</script>
+{% endblock %}

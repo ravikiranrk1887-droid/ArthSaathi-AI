@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}ArthSaathi Assistant — AI Financial Education{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+  <!-- Header Banner -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="brand-icon shadow-sm" style="width: 48px; height: 48px; border-radius: 12px;">
+        <i data-lucide="bot" style="width: 26px; height: 26px; color: white;"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <h1 class="h4 fw-bold text-dark mb-0">ArthSaathi AI Assistant</h1>
+          <span class="badge bg-success-subtle text-success border border-success-subtle d-flex align-items-center gap-1">
+            <span class="rounded-circle bg-success d-inline-block" style="width: 6px; height: 6px;"></span> Active
+          </span>
+        </div>
+        <p class="text-muted small mb-0">Your 24/7 personal banking & financial literacy guide for India</p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" onclick="clearChat()">
+        <i data-lucide="trash-2" style="width: 14px; height: 14px;" class="me-1"></i> Clear Chat
+      </button>
+      <a href="{{ url_for('calculators.index') }}" class="btn btn-outline-primary btn-sm">
+        <i data-lucide="calculator" style="width: 14px; height: 14px;" class="me-1"></i> Calculators
+      </a>
+    </div>
+  </div>
+
+  <!-- Disclaimer Notice -->
+  <div class="alert alert-warning border-warning-subtle small py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2">
+    <i data-lucide="shield-alert" class="text-warning flex-shrink-0" style="width: 16px; height: 16px;"></i>
+    <span>
+      ArthSaathi provides <strong>educational financial information</strong> in INR. It does not provide personalized investment, legal, or tax advice.
+    </span>
+  </div>
+
+  <!-- Suggested Question Quick Pills -->
+  <div class="mb-3">
+    <div class="text-muted small fw-semibold mb-2 d-flex align-items-center gap-1">
+      <i data-lucide="sparkles" style="width: 13px; height: 13px; color: var(--accent);"></i>
+      Popular Questions to Ask:
+    </div>
+    <div class="d-flex gap-2 overflow-x-auto pb-2 flex-nowrap" id="quick-pills">
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">What is a bank and how does it work?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">Explain SIP with a ₹1,000 example</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">What happens if I miss my EMI?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">What is the difference between FD and RD?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">How much will I repay if I borrow ₹5 lakh at 9% for 5 years?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">Explain education loans and moratorium</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">What is the difference between SBI and HDFC home loans?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">How does compound interest work?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">What is a credit score and CIBIL?</button>
+      <button class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 text-nowrap small" onclick="askQuick(this)">How can I save money from my monthly salary?</button>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-3">
+    <!-- Message Stream -->
+    <div id="chat-window" class="chat-window p-4" style="height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; background: #fdfdfd;">
+      <!-- Welcome message from ArthSaathi -->
+      <div class="chat-msg assistant d-flex gap-3 align-items-start">
+        <div class="brand-icon flex-shrink-0" style="width: 36px; height: 36px; border-radius: 10px;">
+          <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
+        </div>
+        <div class="chat-bubble p-3 rounded-4 shadow-xs" style="background: #f8fafc; border: 1px solid #e2e8f0; max-width: 85%;">
+          <div class="fw-bold text-dark mb-1">ArthSaathi AI</div>
+          <div class="bubble-content text-secondary" style="line-height: 1.6;">
+            Namaste! 🙏 I am your financial education assistant.<br/><br/>
+            Whether you want to understand <strong>SIP compounding</strong>, calculate <strong>home loan EMIs</strong>, compare <strong>bank FD rates</strong>, or learn how to create your <strong>first monthly budget</strong>, I am here to help with clear Indian examples in ₹.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Box Bar -->
+    <div class="p-3 bg-white border-top">
+      <form id="chat-form" class="d-flex gap-2">
+        <input type="text" id="chat-input" class="form-control rounded-pill px-4"
+               placeholder="Ask anything about banking, loans, investments, or budgeting..."
+               autocomplete="off" style="font-size: 0.95rem;" />
+        <button type="submit" class="btn btn-finbot-primary rounded-pill px-4 d-flex align-items-center gap-2">
+          <span>Send</span>
+          <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+        </button>
+      </form>
+      <div class="text-center text-muted mt-2" style="font-size: 0.75rem;">
+        ArthSaathi uses verified database models & Google Gemini AI. Always check official bank links for contractual offers.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let conversationId = null;
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const chatWindow = document.getElementById('chat-window');
+
+// Simple Markdown Formatter for Assistant replies
+function formatMarkdown(text) {
+  if (!text) return '';
+  let html = text
+    .replace(/^### (.*$)/gim, '<h5 class="fw-bold text-dark mt-2 mb-1">$1</h5>')
+    .replace(/^#### (.*$)/gim, '<h6 class="fw-bold text-accent mt-2 mb-1">$1</h6>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/`([^`]+)`/gim, '<code class="bg-light px-1 py-0.5 rounded text-dark">$1</code>')
+    .replace(/^\> (.*$)/gim, '<div class="alert alert-info py-2 px-3 my-2 small border-0">$1</div>')
+    .replace(/\n\n/g, '<br/><br/>')
+    .replace(/\n/g, '<br/>');
+  return html;
+}
+
+function appendMessage(role, content) {
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `chat-msg ${role} d-flex gap-3 align-items-start ${role === 'user' ? 'justify-content-end' : ''}`;
+
+  if (role === 'assistant') {
+    msgDiv.innerHTML = `
+      <div class="brand-icon flex-shrink-0" style="width: 36px; height: 36px; border-radius: 10px;">
+        <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
+      </div>
+      <div class="chat-bubble p-3 rounded-4 shadow-xs" style="background: #f8fafc; border: 1px solid #e2e8f0; max-width: 85%;">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="fw-bold text-dark">ArthSaathi AI</span>
+          <button class="btn btn-link p-0 text-muted small text-decoration-none copy-btn" onclick="copyReply(this)" title="Copy text">
+            <i data-lucide="copy" style="width:13px;height:13px;"></i> Copy
+          </button>
+        </div>
+        <div class="bubble-content text-secondary" style="line-height: 1.65;">
+          ${formatMarkdown(content)}
+        </div>
+      </div>
+    `;
+  } else {
+    msgDiv.innerHTML = `
+      <div class="chat-bubble p-3 rounded-4 shadow-xs text-white" style="background: linear-gradient(135deg, var(--accent) 0%, #5b21b6 100%); max-width: 80%; border-bottom-right-radius: 4px;">
+        <div class="bubble-content" style="line-height: 1.5;">${content}</div>
+      </div>
+      <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center flex-shrink-0 text-dark fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
+        You
+      </div>
+    `;
+  }
+
+  chatWindow.appendChild(msgDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  lucide.createIcons();
+}
+
+function appendTyping() {
+  const typingDiv = document.createElement('div');
+  typingDiv.id = 'typing-indicator';
+  typingDiv.className = 'chat-msg assistant d-flex gap-3 align-items-start';
+  typingDiv.innerHTML = `
+    <div class="brand-icon flex-shrink-0" style="width: 36px; height: 36px; border-radius: 10px;">
+      <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
+    </div>
+    <div class="chat-bubble p-3 rounded-4 bg-light text-muted small d-flex align-items-center gap-2">
+      <span class="spinner-grow spinner-grow-sm text-accent" role="status"></span>
+      ArthSaathi is formulating answer...
+    </div>
+  `;
+  chatWindow.appendChild(typingDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  lucide.createIcons();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMessage(text) {
+  const msg = (text || chatInput.value).trim();
+  if (!msg) return;
+
+  appendMessage('user', msg);
+  chatInput.value = '';
+  appendTyping();
+
+  try {
+    const res = await fetch('/chatbot/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, conversation_id: conversationId })
+    });
+    const data = await res.json();
+    removeTyping();
+
+    if (data.success) {
+      conversationId = data.conversation_id || conversationId;
+      appendMessage('assistant', data.response);
+    } else {
+      appendMessage('assistant', data.response || data.error || "Sorry, I could not complete your request. Please try again.");
+    }
+  } catch (err) {
+    removeTyping();
+    appendMessage('assistant', "Network connection error. Please ensure the server is running and try again.");
+  }
+}
+
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  sendMessage();
+});
+
+function askQuick(btn) {
+  sendMessage(btn.textContent.trim());
+}
+
+function copyReply(btn) {
+  const bubble = btn.closest('.chat-bubble').querySelector('.bubble-content');
+  navigator.clipboard.writeText(bubble.innerText);
+  btn.innerHTML = '✓ Copied!';
+  setTimeout(() => { btn.innerHTML = '<i data-lucide="copy" style="width:13px;height:13px;"></i> Copy'; lucide.createIcons(); }, 2000);
+}
+
+function clearChat() {
+  conversationId = null;
+  chatWindow.innerHTML = `
+    <div class="chat-msg assistant d-flex gap-3 align-items-start">
+      <div class="brand-icon flex-shrink-0" style="width: 36px; height: 36px; border-radius: 10px;">
+        <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
+      </div>
+      <div class="chat-bubble p-3 rounded-4 shadow-xs" style="background: #f8fafc; border: 1px solid #e2e8f0; max-width: 85%;">
+        <div class="fw-bold text-dark mb-1">ArthSaathi AI</div>
+        <div class="bubble-content text-secondary" style="line-height: 1.6;">
+          Conversation reset. Ask me anything about Indian banking, savings, loans, or investments!
+        </div>
+      </div>
+    </div>
+  `;
+  lucide.createIcons();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Financial Education — ArthSaathi AI{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="section-heading mb-2">Financial Education</h1>
+  <p class="text-muted mb-4">Choose a topic to start learning.</p>
+  <div class="row g-3">
+    {% set categories = [
+      ('BANKING','Landmark','Banking Basics','Savings, current accounts, cheques, KYC'),
+      ('INVESTMENT','trending-up','Investments','Mutual funds, SIPs, FDs, stocks'),
+      ('LOANS','credit-card','Loans & EMI','Home, education, personal, vehicle loans'),
+      ('PLANNING','target','Financial Planning','Budgeting, retirement, insurance'),
+      ('INDIAN_BANKING','flag','Indian Banking','RBI, NPCI, UPI, government schemes')
+    ] %}
+    {% for cat, icon, label, desc in categories %}
+    <div class="col-md-4">
+      <a href="{{ url_for('education.category_view', category=cat) }}" class="dash-card-link">
+        <div class="feature-card h-100">
+          <div class="feature-icon-wrap"><i data-lucide="{{ icon }}" class="feature-icon"></i></div>
+          <h5 class="feature-title">{{ label }}</h5>
+          <p class="feature-desc">{{ desc }}</p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

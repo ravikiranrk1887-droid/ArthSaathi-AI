@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ category.value | title }} — ArthSaathi AI{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('education.index') }}">Education</a></li>
+      <li class="breadcrumb-item active">{{ category.value | replace('_', ' ') | title }}</li>
+    </ol>
+  </nav>
+  <h1 class="section-heading mb-4">{{ category.value | replace('_', ' ') | title }}</h1>
+  {% if lessons %}
+    <div class="list-group">
+    {% for lesson in lessons %}
+      <a href="{{ url_for('education.lesson_detail', slug=lesson.slug) }}"
+         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ lesson.title }}</strong>
+          <span class="badge bg-secondary ms-2">{{ lesson.difficulty }}</span>
+        </div>
+        <i data-lucide="chevron-right" style="width:16px;height:16px;"></i>
+      </a>
+    {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No lessons yet in this category. Check back soon!</div>
+  {% endif %}
+</div>
+{% endblock %}

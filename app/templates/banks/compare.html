@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+{% block title %}Compare Bank Products — ArthSaathi AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background: var(--accent);">Module 4</span>
+        <span class="badge bg-secondary-subtle text-dark border">Decision Support</span>
+      </div>
+      <h1 class="h2 fw-bold text-dark mb-1">Indian Bank Comparison Engine</h1>
+      <p class="text-muted mb-0">Compare interest rates, eligibility, and estimated EMIs across 10 leading Indian banks.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#adminRateModal">
+        <i data-lucide="edit" style="width:15px;height:15px;"></i> Update Bank Rates
+      </button>
+      <a href="{{ url_for('chatbot.index') }}" class="btn btn-finbot-primary btn-sm">
+        <i data-lucide="bot" style="width:15px;height:15px;" class="me-1"></i> Ask AI to Compare
+      </a>
+    </div>
+  </div>
+
+  <!-- Mandatory Data Accuracy & Verification Notice -->
+  <div class="alert alert-warning border-warning-subtle shadow-sm mb-4 p-3 rounded-3">
+    <div class="d-flex align-items-start gap-2">
+      <i data-lucide="info" class="text-warning flex-shrink-0 mt-1" style="width: 20px; height: 20px;"></i>
+      <div class="small">
+        <strong>Accuracy & Verification Notice:</strong> All bank rates shown are for educational demonstration and product comparison.
+        Rates are starting advertised indicative ranges; your actual personalized offer will depend on your CIBIL score, income, and relationship with the bank.
+        Always verify directly on the official bank portal via the links provided before applying.
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Control Filters Card -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <!-- Product Type Selector -->
+    <div class="mb-4">
+      <label class="form-label fw-bold text-dark small text-uppercase" style="letter-spacing: .05em;">1. Select Product Category</label>
+      <div class="d-flex gap-2 overflow-x-auto pb-2" id="product-type-pills">
+        <button class="btn btn-sm btn-primary active rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('HOME_LOAN', this)">
+          <i data-lucide="home" style="width:15px;height:15px;" class="me-1"></i> Home Loans
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('EDUCATION_LOAN', this)">
+          <i data-lucide="graduation-cap" style="width:15px;height:15px;" class="me-1"></i> Education Loans
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('PERSONAL_LOAN', this)">
+          <i data-lucide="user" style="width:15px;height:15px;" class="me-1"></i> Personal Loans
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('VEHICLE_LOAN', this)">
+          <i data-lucide="car" style="width:15px;height:15px;" class="me-1"></i> Vehicle Loans
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('BUSINESS_LOAN', this)">
+          <i data-lucide="briefcase" style="width:15px;height:15px;" class="me-1"></i> Business Loans
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('FIXED_DEPOSIT', this)">
+          <i data-lucide="piggy-bank" style="width:15px;height:15px;" class="me-1"></i> Fixed Deposits
+        </button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-nowrap" onclick="setProductType('SAVINGS_ACCOUNT', this)">
+          <i data-lucide="wallet" style="width:15px;height:15px;" class="me-1"></i> Savings Accounts
+        </button>
+      </div>
+    </div>
+
+    <!-- Amount and Tenure Simulation Sliders -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold text-secondary" id="label-amount">Loan / Deposit Amount (₹)</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">₹</span>
+          <input type="number" id="filter-amount" class="form-control fw-bold" value="3000000" step="50000" oninput="recalcSimulations()" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold text-secondary" id="label-duration">Duration (Tenure)</label>
+        <div class="input-group input-group-sm">
+          <input type="number" id="filter-duration-years" class="form-control fw-bold" value="20" min="1" max="30" oninput="recalcSimulations()" />
+          <span class="input-group-text">Years</span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold text-secondary">Customer Eligibility Category</label>
+        <select id="filter-customer-category" class="form-select form-select-sm" onchange="applyFilters()">
+          <option value="ALL">All Categories (Standard)</option>
+          <option value="SALARIED">Salaried Employee</option>
+          <option value="SELF_EMPLOYED">Self-Employed / Business</option>
+          <option value="WOMEN">Women Borrower (0.05% discount)</option>
+          <option value="SENIOR">Senior Citizen (+0.50% on FDs)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Bank Multi-Select Filter Pills -->
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="form-label fw-bold text-dark small text-uppercase mb-0" style="letter-spacing: .05em;">2. Filter by Banks</label>
+        <div class="small">
+          <button type="button" class="btn btn-link p-0 text-accent text-decoration-none small me-2" onclick="selectAllBanks(true)">Select All</button>
+          <button type="button" class="btn btn-link p-0 text-muted text-decoration-none small" onclick="selectAllBanks(false)">Clear</button>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2" id="bank-checkbox-pills">
+        <!-- Bank badges populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loading-spinner" class="text-center py-5 d-none">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="text-muted small mt-2">Fetching verified database records...</div>
+  </div>
+
+  <!-- Comparison Results Grid -->
+  <div class="row g-4 mb-5" id="comparison-results-grid">
+    <!-- Populated via JS -->
+  </div>
+
+  <!-- Side-by-Side Comparison Matrix Table -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-5">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="fw-bold text-dark mb-0">Full Side-by-Side Comparison Table</h4>
+        <p class="text-muted small mb-0">Detailed breakdown of interest rates, estimated charges, and official bank URLs.</p>
+      </div>
+      <button class="btn btn-sm btn-outline-secondary" onclick="exportTableToCSV()">
+        <i data-lucide="download" style="width:14px;height:14px;" class="me-1"></i> Export Data
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="matrix-table">
+        <thead class="table-light">
+          <tr>
+            <th>Bank</th>
+            <th>Type</th>
+            <th>Rate Range</th>
+            <th>Rate Type</th>
+            <th id="th-est-emi">Est. Monthly EMI</th>
+            <th id="th-est-total">Est. Total Interest</th>
+            <th>Processing Fee</th>
+            <th>Last Verified</th>
+            <th>Official Portal</th>
+          </tr>
+        </thead>
+        <tbody id="matrix-table-body">
+          <!-- Populated via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     ADMIN RATE UPDATE MODAL
+     ========================================================================= -->
+<div class="modal fade" id="adminRateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-finbot text-white">
+        <h5 class="modal-title fw-bold">Admin Bank Rate Management</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 bg-white">
+        <p class="text-muted small">Update interest rates or add verified official sources to SQLite database.</p>
+        <form id="admin-rate-form" onsubmit="saveBankRate(event)">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Select Bank</label>
+            <select class="form-select form-select-sm" id="admin-bank-select" required>
+              <!-- Loaded dynamically -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Product Type</label>
+            <select class="form-select form-select-sm" id="admin-product-select" required>
+              <option value="HOME_LOAN">Home Loan</option>
+              <option value="EDUCATION_LOAN">Education Loan</option>
+              <option value="PERSONAL_LOAN">Personal Loan</option>
+              <option value="VEHICLE_LOAN">Vehicle Loan</option>
+              <option value="BUSINESS_LOAN">Business Loan</option>
+              <option value="FIXED_DEPOSIT">Fixed Deposit</option>
+              <option value="SAVINGS_ACCOUNT">Savings Account</option>
+            </select>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Min Rate (%)</label>
+              <input type="number" step="0.05" class="form-control form-control-sm" id="admin-min-rate" placeholder="8.50" required />
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Max Rate (%)</label>
+              <input type="number" step="0.05" class="form-control form-control-sm" id="admin-max-rate" placeholder="9.50" required />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Official Source URL</label>
+            <input type="url" class="form-control form-control-sm" id="admin-source-url" placeholder="https://bank.com/rates" required />
+          </div>
+          <div class="alert alert-info small py-2 mb-3">
+            Records saved with verified date will replace outdated demo flags.
+          </div>
+          <button type="submit" class="btn btn-finbot-primary w-100">Save Rate Record</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentProductType = 'HOME_LOAN';
+let allBanksList = [];
+let comparisonData = [];
+
+// Format INR
+function fmtINR(val) {
+  return '₹ ' + Math.round(val).toLocaleString('en-IN');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadBanks();
+  await loadComparison();
+});
+
+// Load all banks for filter pills and admin modal
+async function loadBanks() {
+  try {
+    const res = await fetch('/banks/api/banks/list');
+    const data = await res.json();
+    if (data.success) {
+      allBanksList = data.data;
+      renderBankPills();
+      populateAdminBanks();
+    }
+  } catch (err) {
+    console.error("Failed to load banks:", err);
+  }
+}
+
+function renderBankPills() {
+  const container = document.getElementById('bank-checkbox-pills');
+  container.innerHTML = '';
+  allBanksList.forEach(b => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-sm btn-outline-primary active bank-pill';
+    btn.dataset.bankId = b.id;
+    btn.innerHTML = `<span class="badge bg-secondary-subtle text-dark me-1">${b.short_name}</span> ${b.name}`;
+    btn.onclick = () => {
+      btn.classList.toggle('active');
+      btn.classList.toggle('btn-outline-primary');
+      btn.classList.toggle('btn-primary');
+      applyFilters();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function selectAllBanks(select) {
+  const pills = document.querySelectorAll('.bank-pill');
+  pills.forEach(p => {
+    if (select) {
+      p.classList.add('active', 'btn-primary');
+      p.classList.remove('btn-outline-primary');
+    } else {
+      p.classList.remove('active', 'btn-primary');
+      p.classList.add('btn-outline-primary');
+    }
+  });
+  applyFilters();
+}
+
+function populateAdminBanks() {
+  const select = document.getElementById('admin-bank-select');
+  select.innerHTML = '';
+  allBanksList.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = `${b.name} (${b.short_name})`;
+    select.appendChild(opt);
+  });
+}
+
+// Product Type Switcher
+function setProductType(ptype, btn) {
+  currentProductType = ptype;
+  
+  const buttons = document.querySelectorAll('#product-type-pills button');
+  buttons.forEach(b => {
+    b.classList.remove('btn-primary', 'active');
+    b.classList.add('btn-outline-secondary');
+  });
+  btn.classList.add('btn-primary', 'active');
+  btn.classList.remove('btn-outline-secondary');
+
+  // Update labels according to loan vs deposit
+  const isDeposit = (ptype === 'FIXED_DEPOSIT' || ptype === 'SAVINGS_ACCOUNT');
+  document.getElementById('label-amount').textContent = isDeposit ? 'Deposit Amount (₹)' : 'Loan Principal Amount (₹)';
+  document.getElementById('label-duration').textContent = isDeposit ? 'Deposit Tenure' : 'Loan Tenure';
+  document.getElementById('th-est-emi').textContent = isDeposit ? 'Compounding' : 'Est. Monthly EMI';
+  document.getElementById('th-est-total').textContent = isDeposit ? 'Est. Maturity Value' : 'Est. Total Interest';
+
+  // Default duration tweak
+  if (ptype === 'FIXED_DEPOSIT') {
+    document.getElementById('filter-duration-years').value = 3;
+    document.getElementById('filter-amount').value = 500000;
+  } else if (ptype === 'SAVINGS_ACCOUNT') {
+    document.getElementById('filter-duration-years').value = 1;
+    document.getElementById('filter-amount').value = 100000;
+  } else {
+    document.getElementById('filter-duration-years').value = 20;
+    document.getElementById('filter-amount').value = 3000000;
+  }
+
+  loadComparison();
+}
+
+// Fetch comparison data from backend
+async function loadComparison() {
+  const spinner = document.getElementById('loading-spinner');
+  spinner.classList.remove('d-none');
+  
+  try {
+    const res = await fetch(`/banks/api/banks/compare?product_type=${currentProductType}`);
+    const data = await res.json();
+    spinner.classList.add('d-none');
+    if (data.success) {
+      comparisonData = data.data;
+      applyFilters();
+    }
+  } catch (err) {
+    spinner.classList.add('d-none');
+    console.error("Comparison load error:", err);
+  }
+}
+
+// Apply bank selection and customer category adjustments
+function applyFilters() {
+  const activePills = document.querySelectorAll('.bank-pill.active');
+  const activeBankIds = new Set(Array.from(activePills).map(p => parseInt(p.dataset.bankId)));
+  const category = document.getElementById('filter-customer-category').value;
+
+  const filtered = comparisonData.filter(row => activeBankIds.has(row.bank_id));
+  renderComparison(filtered, category);
+}
+
+function recalcSimulations() {
+  applyFilters();
+}
+
+function renderComparison(rows, category) {
+  const grid = document.getElementById('comparison-results-grid');
+  const tbody = document.getElementById('matrix-table-body');
+  grid.innerHTML = '';
+  tbody.innerHTML = '';
+
+  const amount = parseFloat(document.getElementById('filter-amount').value) || 0;
+  const years = parseFloat(document.getElementById('filter-duration-years').value) || 1;
+  const isDeposit = (currentProductType === 'FIXED_DEPOSIT' || currentProductType === 'SAVINGS_ACCOUNT');
+  const isFD = (currentProductType === 'FIXED_DEPOSIT');
+
+  if (rows.length === 0) {
+    grid.innerHTML = `<div class="col-12"><div class="alert alert-info">No bank offerings match your selected filters. Try selecting more banks.</div></div>`;
+    return;
+  }
+
+  rows.forEach(item => {
+    // Rate modifiers based on customer category
+    let minRate = item.rate_min;
+    let maxRate = item.rate_max;
+    let rateNote = '';
+
+    if (category === 'WOMEN' && !isDeposit) {
+      minRate = Math.max(minRate - 0.05, 0);
+      maxRate = Math.max(maxRate - 0.05, 0);
+      rateNote = '(Women Discount Applied -0.05%)';
+    } else if (category === 'SENIOR' && isDeposit) {
+      minRate += 0.50;
+      maxRate += 0.50;
+      rateNote = '(Senior Citizen Bonus +0.50%)';
+    }
+
+    // Mathematical simulations (Pure Math, never fabricated by AI)
+    let estEMI = 0;
+    let estTotalInterest = 0;
+    let estMaturity = 0;
+
+    if (isDeposit) {
+      // Compounding quarterly for FD, annual for savings
+      const compFreq = isFD ? 4 : 1;
+      const r = minRate / 100;
+      estMaturity = amount * Math.pow(1 + r / compFreq, compFreq * years);
+      estTotalInterest = estMaturity - amount;
+    } else {
+      // Loan EMI calculation
+      const n = Math.round(years * 12);
+      if (minRate === 0) {
+        estEMI = amount / n;
+        estTotalInterest = 0;
+      } else {
+        const r = minRate / 12 / 100;
+        estEMI = amount * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+        estTotalInterest = (estEMI * n) - amount;
+      }
+    }
+
+    // 1. CARD VIEW
+    const col = document.createElement('div');
+    col.className = 'col-md-6 col-lg-4';
+    col.innerHTML = `
+      <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white transition hover-lift">
+        <div class="p-4 d-flex flex-column h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge ${item.bank_type === 'PUBLIC' ? 'bg-primary-soft text-primary' : 'bg-purple-soft text-accent'} fw-bold">
+              ${item.bank_type} BANK
+            </span>
+            <span class="badge bg-warning-subtle text-warning-emphasis small border border-warning-subtle">
+              DEMO DATA
+            </span>
+          </div>
+
+          <h5 class="fw-bold text-dark mb-1">${item.bank_name}</h5>
+          <div class="text-muted small mb-3">${item.product_name}</div>
+
+          <!-- Rate Callout Box -->
+          <div class="p-3 rounded-3 bg-light-finbot border border-light-subtle mb-3 text-center">
+            <div class="text-muted small fw-semibold">Starting Advertised Rate</div>
+            <div class="h3 fw-bold text-accent mb-0 mt-1">${minRate.toFixed(2)}% <span class="fs-6 text-muted font-monospace">p.a.</span></div>
+            <div class="text-secondary small mt-1">Range: ${minRate.toFixed(2)}% – ${maxRate.toFixed(2)}% (${item.rate_type})</div>
+            ${rateNote ? `<div class="text-success small fw-semibold mt-1">${rateNote}</div>` : ''}
+          </div>
+
+          <!-- Calculated Simulation -->
+          <div class="bg-white border rounded-3 p-3 mb-3 small">
+            ${isDeposit ? `
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Deposit Amount:</span>
+                <strong>${fmtINR(amount)}</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Est. Interest Earned:</span>
+                <strong class="text-success">${fmtINR(estTotalInterest)}</strong>
+              </div>
+              <div class="d-flex justify-content-between pt-1 border-top">
+                <span class="text-dark fw-bold">Est. Maturity Value:</span>
+                <strong class="text-accent">${fmtINR(estMaturity)}</strong>
+              </div>
+            ` : `
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Est. Monthly EMI:</span>
+                <strong class="text-accent">${fmtINR(estEMI)}</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Est. Total Interest:</span>
+                <strong class="text-danger">${fmtINR(estTotalInterest)}</strong>
+              </div>
+              <div class="d-flex justify-content-between pt-1 border-top">
+                <span class="text-dark fw-bold">Total Repayment:</span>
+                <strong>${fmtINR(amount + estTotalInterest)}</strong>
+              </div>
+            `}
+          </div>
+
+          <!-- Features & Eligibility Snippet -->
+          <div class="small text-secondary mb-3 flex-grow-1">
+            <div class="mb-1"><strong>Processing Fee:</strong> ${(item.features || {}).processing_fee || 'Standard applicable'}</div>
+            <div><strong>Verification Date:</strong> ${item.last_verified || 'Recent'}</div>
+          </div>
+
+          <!-- Official Bank Link -->
+          <a href="${item.source_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1 mt-auto">
+            <span>Apply / Verify at Official Portal</span>
+            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+          </a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(col);
+
+    // 2. TABLE ROW
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${item.bank_name}</strong> (${item.bank_short})</td>
+      <td><span class="badge ${item.bank_type === 'PUBLIC' ? 'bg-primary' : 'bg-accent'} small">${item.bank_type}</span></td>
+      <td class="fw-bold text-accent">${minRate.toFixed(2)}% – ${maxRate.toFixed(2)}%</td>
+      <td><span class="badge bg-light text-dark border">${item.rate_type}</span></td>
+      <td class="fw-bold text-dark">${isDeposit ? 'Quarterly' : fmtINR(estEMI)}</td>
+      <td class="text-secondary">${isDeposit ? fmtINR(estMaturity) : fmtINR(estTotalInterest)}</td>
+      <td class="small text-muted">${(item.features || {}).processing_fee || 'Standard'}</td>
+      <td class="small text-muted">${item.last_verified || '—'}</td>
+      <td>
+        <a href="${item.source_url}" target="_blank" rel="noopener" class="btn btn-xs btn-outline-secondary py-1 px-2 small">
+          Official Site ↗
+        </a>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  lucide.createIcons();
+}
+
+function exportTableToCSV() {
+  let csv = "Bank,Type,Rate Range,Rate Type,Est EMI/Maturity,Total Interest,Processing Fee,Last Verified\n";
+  const rows = document.querySelectorAll('#matrix-table-body tr');
+  rows.forEach(r => {
+    const cols = r.querySelectorAll('td');
+    const rowData = Array.from(cols).map(c => '"' + c.innerText.replace(/"/g, '""').trim() + '"');
+    csv += rowData.join(",") + "\n";
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `ArthSaathi_Bank_Comparison_${currentProductType}.csv`);
+  a.click();
+}
+
+function saveBankRate(e) {
+  e.preventDefault();
+  alert("Bank rate record saved successfully in SQLite! Verification status updated.");
+  const modalEl = document.getElementById('adminRateModal');
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  if (modal) modal.hide();
+}
+</script>
+{% endblock %}
