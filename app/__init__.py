@@ -40,9 +40,18 @@ def create_app(config_class=Config):
     app.register_blueprint(investments_bp)
 
     # ------------------------------------------------------------------
-    # Create database tables on first run
+    # Create database tables on first run / initialize Vercel DB
     # ------------------------------------------------------------------
     with app.app_context():
+        import os
+        if os.environ.get("VERCEL"):
+            tmp_db = "/tmp/finbot.db"
+            if not os.path.exists(tmp_db):
+                seed_file = os.path.join(app.root_path, "data", "finbot.db")
+                if os.path.exists(seed_file):
+                    import shutil
+                    shutil.copyfile(seed_file, tmp_db)
+
         # Import all models so SQLAlchemy is aware of them before create_all()
         from app.models import user, lesson, quiz, bank, finance, chat  # noqa: F401
         db.create_all()

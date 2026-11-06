@@ -40,6 +40,7 @@ venv.bak/
 *.db
 *.sqlite3
 instance/
+!app/data/finbot.db
 
 # IDE / Editor files
 .vscode/
