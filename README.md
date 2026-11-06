@@ -1,5 +1,11 @@
 # ArthSaathi AI — Learn Finance. Compare Banks. Make Smarter Decisions.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://arth-saathi-ai.vercel.app/)
+[![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0-black?style=for-the-badge&logo=flask)](https://flask.palletsprojects.com/)
+
+> 🌐 **Live Production Website:** **[https://arth-saathi-ai.vercel.app/](https://arth-saathi-ai.vercel.app/)**
+
 ArthSaathi AI is an AI-powered financial literacy, banking comparison, and personal finance decision-support platform built specifically for Indian citizens — including students, working professionals, and families.
 
 ---
@@ -73,6 +79,14 @@ ArthSaathi AI is an AI-powered financial literacy, banking comparison, and perso
 ---
 
 ## 🚀 Quick Start Guide
+
+### ⚡ Live Production URL
+Access the deployed application instantly with zero setup:
+👉 **[https://arth-saathi-ai.vercel.app/](https://arth-saathi-ai.vercel.app/)**
+
+---
+
+### Local Setup & Development
 
 ### 1. Prerequisites
 - Python 3.10+ installed.
